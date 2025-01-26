@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "MeterScan"
 include(":app")
+include(":core:designsystem")
