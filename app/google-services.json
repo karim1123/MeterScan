@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "216454847544",
+    "project_id": "meterscan-d570b",
+    "storage_bucket": "meterscan-d570b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:216454847544:android:6cece0386aed5b96351acd",
+        "android_client_info": {
+          "package_name": "com.gabbasov.meterscan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "216454847544-3noaqvulinci7frlgr6cpnnno8c58g7e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfY-dUDmyYNtbwVuQ8MDHj0HO0cxOiR5M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "216454847544-3noaqvulinci7frlgr6cpnnno8c58g7e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

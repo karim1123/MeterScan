@@ -22,4 +22,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "MeterScan"
 include(":app")
+include(":feature:sign-up")
+
 include(":core:designsystem")
+include(":core:network")
+include(":core:common")
+include(":core:model")
+include(":core:feature-api")
