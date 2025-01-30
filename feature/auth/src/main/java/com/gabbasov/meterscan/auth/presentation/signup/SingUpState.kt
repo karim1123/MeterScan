@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.auth.presentation
+package com.gabbasov.meterscan.auth.presentation.signup
 
 import androidx.compose.runtime.Stable
 import com.gabbasov.meterscan.auth.R

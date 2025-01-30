@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.auth.presentation.navigation
+package com.gabbasov.meterscan.auth.presentation.signup.navigation
 
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
@@ -6,7 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.gabbasov.meterscan.NavigationRoute
 import com.gabbasov.meterscan.features.SignUpFeatureApi
-import com.gabbasov.meterscan.auth.presentation.SignUpScreenRoute
+import com.gabbasov.meterscan.auth.presentation.signup.SignUpScreenRoute
+import com.gabbasov.meterscan.auth.presentation.signup.rememberSignUpCoordinator
 
 class SignUpNavigation : SignUpFeatureApi {
     override fun signUpRoute() = NavigationRoute.SIGN_UP.route
@@ -18,7 +19,7 @@ class SignUpNavigation : SignUpFeatureApi {
     ) {
         navGraphBuilder.composable(signUpRoute()) {
             SignUpScreenRoute(
-                navController,
+                rememberSignUpCoordinator(navController = navController),
             )
         }
     }

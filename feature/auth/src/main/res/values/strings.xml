@@ -3,4 +3,6 @@
     <string name="email_label">Email</string>
     <string name="password_label">Password</string>
     <string name="confirm_password_label">Confirm password</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="log_in">Log in</string>
 </resources>

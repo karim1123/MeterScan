@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.auth.presentation
+package com.gabbasov.meterscan.auth.presentation.signup
 
 import androidx.lifecycle.viewModelScope
 import com.gabbasov.meterscan.auth.User
@@ -31,6 +31,7 @@ internal class SignUpViewModel(
                     content = state.content.copy(
                         email = action.email
                     ),
+                    error = null
                 )
             }
             is SignUpAction.PasswordChanged -> {
@@ -38,6 +39,7 @@ internal class SignUpViewModel(
                     content = state.content.copy(
                         password = action.password
                     ),
+                    error = null
                 )
             }
             is SignUpAction.RepeatPasswordChanged -> {
@@ -45,6 +47,7 @@ internal class SignUpViewModel(
                     content = state.content.copy(
                         confirmPassword = action.repeatPassword
                     ),
+                    error = null
                 )
             }
             is SignUpAction.SignUpPressed -> {
