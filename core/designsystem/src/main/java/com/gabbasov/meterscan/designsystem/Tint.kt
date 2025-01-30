@@ -9,5 +9,4 @@ data class TintTheme(
     val iconTint: Color = Color.Unspecified,
 )
 
-
 val LocalTintTheme = staticCompositionLocalOf { TintTheme() }
