@@ -16,18 +16,15 @@ internal data class SignUpState(
 
 @Stable
 internal data class SignUpData(
-    val email: TextFieldValue =
-        TextFieldValue(
-            label = Text.ResourceString(R.string.email_label),
-        ),
-    val password: TextFieldValue =
-        TextFieldValue(
-            label = Text.ResourceString(R.string.password_label),
-        ),
-    val confirmPassword: TextFieldValue =
-        TextFieldValue(
-            label = Text.ResourceString(R.string.confirm_password_label),
-        ),
+    val email: TextFieldValue = TextFieldValue(
+        label = Text.ResourceString(R.string.email_label),
+    ),
+    val password: TextFieldValue = TextFieldValue(
+        label = Text.ResourceString(R.string.password_label),
+    ),
+    val confirmPassword: TextFieldValue = TextFieldValue(
+        label = Text.ResourceString(R.string.confirm_password_label),
+    ),
 )
 
 internal sealed interface SignUpAction : BaseAction {
@@ -38,6 +35,4 @@ internal sealed interface SignUpAction : BaseAction {
     data class RepeatPasswordChanged(val repeatPassword: TextFieldValue) : SignUpAction
 
     data object SignUpPressed : SignUpAction
-
-    data object NavToLogInPressed : SignUpAction
 }

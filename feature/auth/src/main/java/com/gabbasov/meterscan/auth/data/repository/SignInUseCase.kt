@@ -6,18 +6,16 @@ import com.gabbasov.meterscan.auth.domain.AuthRepository
 import com.gabbasov.meterscan.network.Errors
 import com.gabbasov.meterscan.network.Resource
 
-const val MIN_PASSWORD_LENGTH = 6
-
-class SignUpUseCase(
+class SignInUseCase(
     private val authRepository: AuthRepository
 ) {
-    data class Params(val email: String, val password: String, val repeatPassword: String)
+    data class Params(val email: String, val password: String)
 
     suspend fun execute(params: Params): Resource<User> {
         validate(params)?.let { error ->
             return Resource.Error(Throwable(error.name))
         }
-        return authRepository.signUp(params.email, params.password)
+        return authRepository.signIn(params.email, params.password)
     }
 
     private fun validate(params: Params): Errors? = when {
@@ -25,7 +23,6 @@ class SignUpUseCase(
         !Patterns.EMAIL_ADDRESS.matcher(params.email).matches() -> Errors.INVALID_EMAIL
         params.password.isBlank() -> Errors.EMPTY_PASSWORD
         params.password.length < MIN_PASSWORD_LENGTH -> Errors.SHORT_PASSWORD
-        params.password != params.repeatPassword -> Errors.PASSWORDS_DO_NOT_MATCH
         else -> null
     }
 }
