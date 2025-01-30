@@ -5,9 +5,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 
 fun NavGraphBuilder.register(
-    featureApi: FeatureApi,
-    navController: NavHostController,
     modifier: Modifier = Modifier,
+    navController: NavHostController,
+    featureApi: FeatureApi,
 ) {
     featureApi.registerGraph(
         navGraphBuilder = this,
