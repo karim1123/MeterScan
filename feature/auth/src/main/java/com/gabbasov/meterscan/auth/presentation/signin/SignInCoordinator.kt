@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.auth.presentation.signup
+package com.gabbasov.meterscan.auth.presentation.signin
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -6,15 +6,15 @@ import androidx.navigation.NavHostController
 import com.gabbasov.meterscan.ui.TextFieldValue
 import org.koin.androidx.compose.koinViewModel
 
-internal class SignUpCoordinator(
-    private val viewModel: SignUpViewModel,
+internal class SignInCoordinator(
+    private val viewModel: SignInViewModel,
     private val navController: NavHostController,
 ) {
     val state = viewModel.uiState
 
     fun onEmailChanged(email: String) {
         viewModel.execute(
-            SignUpAction.EmailChanged(
+            SignInAction.EmailChanged(
                 TextFieldValue(
                     value = email,
                     isError = false
@@ -25,7 +25,7 @@ internal class SignUpCoordinator(
 
     fun onPasswordChanged(password: String) {
         viewModel.execute(
-            SignUpAction.PasswordChanged(
+            SignInAction.PasswordChanged(
                 TextFieldValue(
                     value = password,
                     isError = false
@@ -34,33 +34,22 @@ internal class SignUpCoordinator(
         )
     }
 
-    fun onRepeatPasswordChanged(repeatPassword: String) {
-        viewModel.execute(
-            SignUpAction.RepeatPasswordChanged(
-                TextFieldValue(
-                    value = repeatPassword,
-                    isError = false
-                ),
-            ),
-        )
+    fun onSignInPressed() {
+        viewModel.execute(SignInAction.SignInPressed)
     }
 
-    fun onSignUpPressed() {
-        viewModel.execute(SignUpAction.SignUpPressed)
-    }
-
-    fun onBackClicked() {
-        navController.popBackStack()
+    fun onNavigateToSignUp() {
+        navController.navigate(viewModel.signUpApi.signUpRoute())
     }
 }
 
 @Composable
-internal fun rememberSignUpCoordinator(
-    viewModel: SignUpViewModel = koinViewModel(),
+internal fun rememberSignInCoordinator(
+    viewModel: SignInViewModel = koinViewModel(),
     navController: NavHostController,
-): SignUpCoordinator {
+): SignInCoordinator {
     return remember(viewModel) {
-        SignUpCoordinator(
+        SignInCoordinator(
             viewModel = viewModel,
             navController = navController,
         )

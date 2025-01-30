@@ -45,6 +45,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:feature-api"))
     implementation(project(":core:network"))
+    implementation(project(":core:model"))
     implementation(project(":feature:auth"))
 
     implementation(libs.androidx.core.ktx)

@@ -5,7 +5,7 @@ import com.gabbasov.meterscan.domain.BaseAction
 import timber.log.Timber
 
 abstract class BaseViewModel : ViewModel() {
-    open fun execute(action: BaseAction) {
+    fun logAction(action: BaseAction) {
         Timber.d("TEST123 execute action: $action")
     }
 }
