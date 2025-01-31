@@ -8,7 +8,7 @@ import androidx.compose.ui.text.style.LineHeightStyle.Alignment
 import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.unit.sp
 
-internal val NiaTypography =
+internal val MeterScanTypography =
     Typography(
         displayLarge =
             TextStyle(
