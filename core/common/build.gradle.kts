@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.accompanist.navigation.animation)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
     debugImplementation(libs.androidx.ui.tooling)
