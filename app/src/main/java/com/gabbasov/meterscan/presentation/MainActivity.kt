@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import com.gabbasov.meterscan.designsystem.MeterScanTheme
+import com.gabbasov.meterscan.main.presentation.main.CameraScreen
 import com.gabbasov.meterscan.presentation.navigation.MeterScanNavHost
 import org.koin.androidx.compose.KoinAndroidContext
 
@@ -26,6 +27,7 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxSize()
                                 .background(MaterialTheme.colorScheme.background),
                     ) {
+                        //CameraScreen({}, {}, {})
                         MeterScanNavHost()
                     }
                 }

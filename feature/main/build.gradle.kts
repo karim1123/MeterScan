@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.gabbasov.meterscan"
+    namespace = "com.gabbasov.meterscan.main"
     compileSdk = 35
 
     defaultConfig {
@@ -20,7 +20,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
+                "proguard-rules.pro"
             )
         }
     }
@@ -29,12 +29,17 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        freeCompilerArgs += listOf("-Xcontext-receivers")
         jvmTarget = "11"
     }
 }
 
 dependencies {
+    implementation(project(":core:model"))
+    implementation(project(":core:common"))
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:network"))
+    implementation(project(":core:feature-api"))
+
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -52,6 +57,13 @@ dependencies {
     implementation(libs.timber)
 
     implementation(project.dependencies.platform(libs.koin.bom))
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.compose)
     implementation(libs.koin.core)
-    implementation(libs.timber)
+
+    implementation (libs.androidx.camera.core)
+    implementation (libs.androidx.camera.camera2)
+    implementation (libs.androidx.camera.view)
+    implementation (libs.androidx.camera.lifecycle)
 }
