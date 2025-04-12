@@ -2,10 +2,11 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.gabbasov.meterscan"
+    namespace = "com.gabbasov.meterscan.meters"
     compileSdk = 35
 
     defaultConfig {
@@ -29,13 +30,17 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        freeCompilerArgs += listOf("-Xcontext-receivers")
         jvmTarget = "11"
+        freeCompilerArgs += listOf("-Xcontext-receivers")
     }
 }
 
 dependencies {
+    implementation(project(":core:model"))
+    implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
+    implementation(project(":core:network"))
+    implementation(project(":core:feature-api"))
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
@@ -49,12 +54,22 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.accompanist.navigation.animation)
-    implementation(libs.androidx.camera.lifecycle)
-    implementation(libs.androidx.camera.view)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.timber)
 
     implementation(project.dependencies.platform(libs.koin.bom))
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.compose)
     implementation(libs.koin.core)
-    implementation(libs.timber)
+
+    implementation(libs.androidx.material)
+
+    // Room dependencies
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    // Изображения
+    implementation(libs.coil.compose)
 }

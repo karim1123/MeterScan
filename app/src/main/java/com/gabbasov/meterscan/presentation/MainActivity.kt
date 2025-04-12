@@ -27,8 +27,8 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxSize()
                                 .background(MaterialTheme.colorScheme.background),
                     ) {
-                        CameraScreen({}, {}, {})
-                        //MeterScanNavHost()
+                        //CameraScreen({}, {}, {})
+                        MeterScanNavHost()
                     }
                 }
             }

@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.gabbasov.meterscan.presentation.MainActivityViewModel
 import com.gabbasov.meterscan.register
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import org.koin.androidx.compose.koinViewModel
@@ -22,7 +23,7 @@ fun MeterScanNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = viewModel.signInApi.signInRoute(),
+        startDestination = if (isAuthorized) viewModel.metersFeatureApi.meterListRoute() else viewModel.signInApi.signInRoute(),
     ) {
         register(
             modifier = modifier,
@@ -33,6 +34,11 @@ fun MeterScanNavHost(
             modifier = modifier,
             navController = navController,
             featureApi = viewModel.signUpApi,
+        )
+        register(
+            modifier = modifier,
+            navController = navController,
+            featureApi = viewModel.metersFeatureApi,
         )
     }
 }
