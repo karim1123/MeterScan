@@ -2,6 +2,7 @@
 accompanistNavigationAnimation = "0.30.1"
 agp = "8.8.0"
 cameraCore = "1.4.1"
+composeCharts = "0.1.2"
 firebaseBom = "33.12.0"
 kotlin = "2.1.0"
 coreKtx = "1.15.0"
@@ -33,6 +34,7 @@ accompanist-navigation-animation = { module = "com.google.accompanist:accompanis
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-foundation = { module = "androidx.compose.foundation:foundation" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
+compose-charts = { module = "io.github.ehsannarmani:compose-charts", version.ref = "composeCharts" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

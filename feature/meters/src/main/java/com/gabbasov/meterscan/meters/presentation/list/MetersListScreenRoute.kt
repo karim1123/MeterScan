@@ -1,5 +1,6 @@
 package com.gabbasov.meterscan.meters.presentation.list
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,7 +55,7 @@ internal fun MetersListScreenRoute(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Мои счетчики") }
+                title = { Text(text = "Cчетчики") }
             )
         },
         floatingActionButton = {
@@ -106,8 +107,8 @@ private fun MetersListScreen(
             }
             else -> {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(vertical = 8.dp)
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(state.meters, key = { it.id }) { meter ->
                         MeterListItem(

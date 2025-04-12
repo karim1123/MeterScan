@@ -72,4 +72,6 @@ dependencies {
 
     // Изображения
     implementation(libs.coil.compose)
+
+    implementation (libs.compose.charts)
 }
