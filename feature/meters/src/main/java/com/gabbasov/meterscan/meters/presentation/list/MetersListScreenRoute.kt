@@ -57,13 +57,6 @@ internal fun MetersListScreenRoute(
                 title = { Text(text = "Cчетчики") }
             )
         },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { coordinator.onAddNewMeter() },
-                icon = { Icon(Icons.Filled.Add, contentDescription = "Добавить") },
-                text = { Text("Добавить счетчик") }
-            )
-        },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         MetersListScreen(

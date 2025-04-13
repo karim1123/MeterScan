@@ -13,18 +13,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,62 +36,64 @@ import com.gabbasov.meterscan.meters.domain.Meter
 import com.gabbasov.meterscan.meters.domain.MeterReading
 import com.gabbasov.meterscan.meters.domain.MeterType
 import com.gabbasov.meterscan.meters.presentation.details.calculateMonthlyConsumption
-import com.gabbasov.meterscan.meters.presentation.details.calculateYearConsumption
 import com.gabbasov.meterscan.meters.presentation.details.components.ReadingListItem
 import com.gabbasov.meterscan.meters.presentation.details.components.YearConsumptionChart
 import com.gabbasov.meterscan.meters.presentation.details.getMeterUnits
+import com.gabbasov.meterscan.meters.presentation.details.prepareMonthlyData
 import java.time.LocalDate
-import java.util.Calendar
+import java.time.Month
+import java.time.format.TextStyle
+import java.util.Locale
+import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReadingsHistoryTab(meter: Meter) {
     val currentYear = LocalDate.now().year
-    var selectedYear by remember { mutableStateOf(currentYear) }
+    var selectedYear by remember { mutableIntStateOf(currentYear) }
     var showYearPicker by remember { mutableStateOf(false) }
-
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = Calendar.getInstance().apply {
-            set(Calendar.YEAR, selectedYear)
-            set(Calendar.MONTH, 0)
-            set(Calendar.DAY_OF_MONTH, 1)
-        }.timeInMillis
-    )
+    var selectedMonth by remember { mutableStateOf<Month?>(null) }
 
     if (showYearPicker) {
-        DatePickerDialog(
+        AlertDialog(
             onDismissRequest = { showYearPicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            val calendar = Calendar.getInstance().apply {
-                                timeInMillis = millis
-                            }
-                            selectedYear = calendar.get(Calendar.YEAR)
+            title = { Text("Выберите год") },
+            text = {
+                Column {
+                    // Генерируем список лет на основе показаний
+                    val years = meter.readings
+                        .map { it.date.year }
+                        .distinct()
+                        .sorted()
+
+                    years.forEach { year ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedYear = year
+                                    showYearPicker = false
+                                }
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = year.toString(),
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = if (year == selectedYear) FontWeight.Bold else FontWeight.Normal,
+                                color = if (year == selectedYear) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            )
                         }
-                        showYearPicker = false
                     }
-                ) {
-                    Text("Выбрать")
                 }
             },
-            dismissButton = {
-                TextButton(
-                    onClick = { showYearPicker = false }
-                ) {
-                    Text("Отмена")
+            confirmButton = {
+                TextButton(onClick = { showYearPicker = false }) {
+                    Text("Закрыть")
                 }
             }
-        ) {
-            DatePicker(
-                state = datePickerState,
-                showModeToggle = false
-            )
-        }
+        )
     }
 
-    // Фильтруем показания по выбранному году
     val yearReadings = meter.readings.filter {
         it.date.year == selectedYear
     }.sortedBy { it.date }
@@ -103,7 +103,6 @@ fun ReadingsHistoryTab(meter: Meter) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // 1. Блок выбора года
         item {
             Card(
                 modifier = Modifier.fillMaxWidth()
@@ -142,7 +141,6 @@ fun ReadingsHistoryTab(meter: Meter) {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // 2. Блок с графиком
         item {
             Card(
                 modifier = Modifier.fillMaxWidth()
@@ -150,20 +148,20 @@ fun ReadingsHistoryTab(meter: Meter) {
                 Column(
                     modifier = Modifier.padding(16.dp)
                 ) {
+                    // Изменено название на год и месяц
                     Text(
-                        text = "Показания за $selectedYear год",
+                        text = if (selectedMonth != null) {
+                            "${
+                                selectedMonth!!.getDisplayName(
+                                    TextStyle.FULL_STANDALONE,
+                                    Locale("ru")
+                                )
+                            } $selectedYear"
+                        } else {
+                            "$selectedYear год"
+                        },
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    val totalYearConsumption = calculateYearConsumption(yearReadings)
-                    Text(
-                        text = "Суммарно за год: $totalYearConsumption ${getMeterUnits(meter.type)}",
-                        style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
@@ -180,12 +178,48 @@ fun ReadingsHistoryTab(meter: Meter) {
                             textAlign = TextAlign.Center
                         )
                     } else {
-                        // График с сокращенными названиями месяцев
                         YearConsumptionChart(
                             modifier = Modifier.height(200.dp),
                             readings = yearReadings,
-                            meterType = meter.type
+                            meterType = meter.type,
+                            onMonthSelected = { month ->
+                                selectedMonth = month
+                            }
                         )
+                    }
+
+                    if (selectedMonth != null) {
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        val monthConsumption =
+                            prepareMonthlyData(yearReadings)[selectedMonth] ?: 0.0
+                        val monthReading = yearReadings
+                            .filter { it.date.month == selectedMonth }
+                            .maxByOrNull { it.date }
+
+                        if (monthReading != null) {
+                            Text(
+                                text = "Показание за ${
+                                    selectedMonth!!.getDisplayName(
+                                        TextStyle.FULL,
+                                        Locale("ru")
+                                    )
+                                }: ${monthReading.value.roundToInt()} ${getMeterUnits(meter.type)}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp),
+                            )
+
+                            Spacer(modifier = Modifier.height(4.dp))
+
+                            Text(
+                                text = "Потребление: ${monthConsumption.roundToInt()} ${getMeterUnits(meter.type)}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.fillMaxWidth(),
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
             }
@@ -220,6 +254,7 @@ fun ReadingsHistoryTab(meter: Meter) {
         }
     }
 }
+
 
 @Preview
 @Composable
