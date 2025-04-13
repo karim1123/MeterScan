@@ -2,7 +2,6 @@ package com.gabbasov.meterscan.meters.presentation.details.components
 
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -47,17 +46,19 @@ fun YearConsumptionChart(
         )
     )
 
-    val monthlyData = prepareMonthlyData(readings)
-    val monthMapping = mutableMapOf<Int, Month>()
-    val barsData = monthlyData.toList().mapIndexed { index, (month, value) ->
-        monthMapping[index] = month
+    val monthMap = mutableMapOf<Int, Month>()
+
+    val monthlyData = prepareMonthlyData(readings).map { (month, reading) ->
+        val monthId = month.ordinal + 1 // Используем порядковый номер месяца + 1 как ID
+        monthMap[monthId] = month // Сохраняем соответствие ID и месяца
 
         Bars(
             label = month.getDisplayName(TextStyle.SHORT, Locale("ru")).take(3).uppercase(),
             values = listOf(
                 Bars.Data(
+                    id = monthId, // Используем месяц как уникальный ID
                     label = "Потребление",
-                    value = value,
+                    value = reading,
                     color = chartBrush
                 )
             )
@@ -68,10 +69,9 @@ fun YearConsumptionChart(
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp),
-        data = barsData,
+        data = monthlyData,
         onBarClick = { barData ->
-            val barIndex = barsData.indexOfFirst { it.values.contains(barData) }
-            val clickedMonth = monthMapping[barIndex]
+            val clickedMonth = monthMap[barData.id]
 
             if (clickedMonth != null) {
                 onMonthSelected(clickedMonth)
@@ -103,27 +103,29 @@ fun YearConsumptionChart(
     )
 }
 
-@Preview(showBackground = true)
 @Composable
+@Preview(showBackground = true)
 fun YearConsumptionChartPreview() {
     val readings = listOf(
         MeterReading(
-            date = java.time.LocalDate.now(),
+            date = java.time.LocalDate.of(2023, 1, 1),
             value = 100.0
         ),
         MeterReading(
-            date = java.time.LocalDate.now().plusMonths(1),
-            value = 200.0
+            date = java.time.LocalDate.of(2023, 2, 1),
+            value = 150.0
         ),
         MeterReading(
-            date = java.time.LocalDate.now().plusMonths(2),
-            value = 150.0
+            date = java.time.LocalDate.of(2023, 3, 1),
+            value = 200.0
         )
     )
 
     YearConsumptionChart(
         readings = readings,
         meterType = MeterType.ELECTRICITY,
-        onMonthSelected = {}
+        onMonthSelected = { month ->
+            Log.d("YearConsumptionChart", "Selected month: $month")
+        }
     )
 }
