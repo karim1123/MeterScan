@@ -24,6 +24,7 @@ import java.util.Locale
 
 @Composable
 fun YearConsumptionChart(
+    modifier: Modifier = Modifier,
     readings: List<MeterReading>,
     meterType: MeterType
 ) {
@@ -43,13 +44,13 @@ fun YearConsumptionChart(
     )
 
     // Подготавливаем данные по месяцам, включая пустые месяцы
-    val monthlyData = prepareMonthlyData(readings).map { (month, reading) ->
+    val monthlyData = prepareMonthlyData(readings).map { (month, consumption) ->
         Bars(
             label = month.getDisplayName(TextStyle.SHORT, Locale("ru")).take(3).uppercase(),
             values = listOf(
                 Bars.Data(
-                    label = "Показания",
-                    value = reading?.value ?: 0.0,
+                    label = "Потребление",
+                    value = consumption,
                     color = chartBrush
                 )
             )
@@ -58,7 +59,7 @@ fun YearConsumptionChart(
 
     // Отображаем график
     ColumnChart(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp),
         data = monthlyData,

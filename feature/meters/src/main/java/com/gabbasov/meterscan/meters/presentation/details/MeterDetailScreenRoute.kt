@@ -50,6 +50,7 @@ import com.gabbasov.meterscan.meters.presentation.components.MeterTypeIcon
 import com.gabbasov.meterscan.meters.presentation.details.tabs.AboutMeterTab
 import com.gabbasov.meterscan.meters.presentation.details.tabs.ReadingsHistoryTab
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.Month
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,7 +111,7 @@ internal fun MeterDetailScreenRoute(
                         )
                     }
                 },
-                actions = {
+               /* actions = {
                     IconButton(onClick = { coordinator.onEditMeter() }) {
                         Icon(
                             imageVector = Icons.Default.Edit,
@@ -123,7 +124,7 @@ internal fun MeterDetailScreenRoute(
                             contentDescription = "Удалить"
                         )
                     }
-                }
+                }*/
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -183,14 +184,6 @@ private fun RedesignedMeterDetailScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(
-                    text = "Счетчик",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -234,49 +227,4 @@ private fun RedesignedMeterDetailScreen(
             1 -> ReadingsHistoryTab(meter)
         }
     }
-}
-
-// Вспомогательные функции
-
-fun getMeterTypeText(type: MeterType): String {
-    return when (type) {
-        MeterType.ELECTRICITY -> "Счетчик электроэнергии"
-        MeterType.WATER -> "Счетчик воды"
-        MeterType.GAS -> "Счетчик газа"
-    }
-}
-
-fun getMeterUnits(type: MeterType): String {
-    return when (type) {
-        MeterType.ELECTRICITY -> "кВт·ч"
-        MeterType.WATER -> "м³"
-        MeterType.GAS -> "м³"
-    }
-}
-
-fun calculateYearConsumption(readings: List<MeterReading>): Double {
-    if (readings.isEmpty()) return 0.0
-
-    // Предполагаем, что мы хотим посчитать разницу между последним и первым показанием за год
-    val sortedReadings = readings.sortedBy { it.date }
-    return if (sortedReadings.size >= 2) {
-        sortedReadings.last().value - sortedReadings.first().value
-    } else {
-        sortedReadings.firstOrNull()?.value ?: 0.0
-    }
-}
-
-fun prepareMonthlyData(readings: List<MeterReading>): Map<Month, MeterReading?> {
-    // Создаем мапу для всех месяцев года
-    val monthsMap = Month.values().associateWith { null as MeterReading? }
-
-    // Добавляем актуальные показания (берем последнее показание за каждый месяц)
-    val monthlyReadings = readings
-        .groupBy { it.date.month }
-        .mapValues { (_, monthReadings) ->
-            monthReadings.maxByOrNull { it.date.dayOfMonth }
-        }
-
-    // Объединяем все месяцы с имеющимися показаниями
-    return monthsMap + monthlyReadings
 }

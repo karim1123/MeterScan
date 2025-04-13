@@ -20,11 +20,13 @@ import com.gabbasov.meterscan.meters.domain.MeterType
 import com.gabbasov.meterscan.meters.presentation.details.getMeterUnits
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun ReadingListItem(
     reading: MeterReading,
-    meterType: MeterType
+    meterType: MeterType,
+    consumption: Double = 0.0
 ) {
     Row(
         modifier = Modifier
@@ -53,13 +55,15 @@ fun ReadingListItem(
                 style = MaterialTheme.typography.bodySmall,
                 color = Color(0xFF4CAF50)
             )
+
         }
 
-        Text(
-            text = "${reading.value} ${getMeterUnits(meterType)}",
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold
-        )
+        if (consumption > 0) {
+            Text(
+                text = "${consumption.roundToInt()} ${getMeterUnits(meterType)}",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
     }
 }
 

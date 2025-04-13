@@ -20,10 +20,7 @@ class MockDataProvider(private val database: MeterScanDatabase) {
      * Проверяет, пуста ли БД, и если да - заполняет тестовыми данными
      */
     suspend fun populateMockDataIfNeeded() = withContext(Dispatchers.IO) {
-        // Проверяем, есть ли записи в БД
         val meterCount = database.meterDao().getMeterCount()
-
-        // Если счетчиков нет, заполняем БД
         if (meterCount == 0) {
             populateMockData()
         }
@@ -33,45 +30,24 @@ class MockDataProvider(private val database: MeterScanDatabase) {
      * Заполняет базу данных тестовыми данными
      */
     private suspend fun populateMockData() = withContext(Dispatchers.IO) {
-        // Создаем случайные счетчики разных типов
-        val meters = listOf(
-            createMockMeter(
-                MeterType.ELECTRICITY,
-                "54762198",
-                "ул. Ленина, д. 42, кв. 15",
-                "Иванов Иван Иванович"
-            ),
-            createMockMeter(
-                MeterType.WATER,
-                "78452196",
-                "ул. Пушкина, д. 10, кв. 78",
-                "Петров Петр Петрович"
-            ),
-            createMockMeter(
-                MeterType.GAS,
-                "12453698",
-                "ул. Гагарина, д. 15, кв. 3",
-                "Сидорова Мария Ивановна"
-            ),
-            createMockMeter(
-                MeterType.ELECTRICITY,
-                "89541237",
-                "пр. Космонавтов, д. 25, кв. 144",
-                "Кузнецов Алексей Викторович"
-            ),
-            createMockMeter(
-                MeterType.WATER,
-                "74125638",
-                "ул. Строителей, д. 7, кв. 21",
-                "Иванов Иван Иванович"
-            )
+        val izhevskAddresses = listOf(
+            "г. Ижевск, ул. Пушкинская, д. 278, кв. 15",
+            "г. Ижевск, ул. Удмуртская, д. 304, кв. 78",
+            "г. Ижевск, ул. Ленина, д. 45, кв. 3",
+            "г. Ижевск, ул. Молодежная, д. 111, кв. 144",
+            "г. Ижевск, ул. Советская, д. 22, кв. 21"
         )
 
-        // Сохраняем счетчики в базу данных
+        val meters = listOf(
+            createMockMeter(MeterType.ELECTRICITY, "54762198", izhevskAddresses[0], "Иванов Иван Иванович"),
+            createMockMeter(MeterType.WATER, "78452196", izhevskAddresses[1], "Петров Петр Петрович"),
+            createMockMeter(MeterType.GAS, "12453698", izhevskAddresses[2], "Сидорова Мария Ивановна"),
+            createMockMeter(MeterType.ELECTRICITY, "89541237", izhevskAddresses[3], "Кузнецов Алексей Викторович"),
+            createMockMeter(MeterType.WATER, "74125638", izhevskAddresses[4], "Иванов Иван Иванович")
+        )
+
         meters.forEach { meter ->
             database.meterDao().insertMeter(meter)
-
-            // Создаем и сохраняем показания для каждого счетчика
             val readings = createMockReadingsForMeter(meter.id, meter.type)
             database.readingDao().insertReadings(readings)
         }
@@ -87,7 +63,6 @@ class MockDataProvider(private val database: MeterScanDatabase) {
         owner: String
     ): MeterEntity {
         val now = LocalDate.now()
-
         return MeterEntity(
             id = UUID.randomUUID().toString(),
             type = type,
@@ -104,28 +79,36 @@ class MockDataProvider(private val database: MeterScanDatabase) {
      * Создает тестовые показания для счетчика
      */
     private fun createMockReadingsForMeter(meterId: String, type: MeterType): List<ReadingEntity> {
-        val startDate = LocalDate.now().minusMonths(7)
+        val startDate = LocalDate.now().minusYears(5)
         val readings = mutableListOf<ReadingEntity>()
 
-        // Генерируем начальное значение в зависимости от типа счетчика
+        // Начальное значение
         var currentValue = when (type) {
             MeterType.ELECTRICITY -> Random.nextDouble(1000.0, 10000.0)
             MeterType.WATER -> Random.nextDouble(50.0, 500.0)
             MeterType.GAS -> Random.nextDouble(100.0, 1000.0)
         }
 
-        // Создаем показания за последние 6 месяцев, плюс текущий месяц
-        for (i in 0..6) {
+        // Создаем показания за 5 лет (60 месяцев)
+        for (i in 0..60) {
             val date = startDate.plusMonths(i.toLong())
+            val month = date.monthValue
 
-            // Увеличиваем значение для каждого месяца
+            // Увеличиваем значение в зависимости от типа счетчика
             currentValue += when (type) {
-                MeterType.ELECTRICITY -> Random.nextDouble(100.0, 300.0)
-                MeterType.WATER -> Random.nextDouble(3.0, 10.0)
-                MeterType.GAS -> Random.nextDouble(10.0, 50.0)
+                MeterType.ELECTRICITY -> Random.nextDouble(100.0, 300.0) // 100-300 кВтч в месяц
+                MeterType.WATER -> Random.nextDouble(0.0, 30.0) // 0-30 м³ в месяц
+                MeterType.GAS -> {
+                    // Сезонность для газа: больше зимой (октябрь-март), меньше летом (апрель-сентябрь)
+                    if (month in 10..12 || month in 1..3) {
+                        Random.nextDouble(300.0, 1200.0) // Зимой высокое потребление
+                    } else {
+                        Random.nextDouble(0.0, 300.0) // Летом низкое потребление
+                    }
+                }
             }
 
-            // Округляем значения для более реалистичных показаний
+            // Округляем значения
             val roundedValue = when (type) {
                 MeterType.ELECTRICITY -> (currentValue * 10).roundToInt() / 10.0
                 MeterType.WATER -> (currentValue * 100).roundToInt() / 100.0
@@ -163,13 +146,11 @@ class MockDataProvider(private val database: MeterScanDatabase) {
                 "Повышенное энергопотребление",
                 "Проблемы со стабильностью напряжения"
             )
-
             MeterType.WATER -> listOf(
                 "Счетчик холодной воды",
                 "Счетчик горячей воды",
                 "Установлен фильтр грубой очистки"
             )
-
             MeterType.GAS -> listOf(
                 "Требуется регулярная проверка на утечки",
                 "Проведена проверка на герметичность",
@@ -177,10 +158,6 @@ class MockDataProvider(private val database: MeterScanDatabase) {
             )
         }
 
-        return if (Random.nextBoolean()) {
-            commonNotes.random()
-        } else {
-            typeSpecificNotes.random()
-        }
+        return if (Random.nextBoolean()) commonNotes.random() else typeSpecificNotes.random()
     }
 }

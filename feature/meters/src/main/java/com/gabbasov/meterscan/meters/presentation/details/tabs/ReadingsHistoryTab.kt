@@ -1,5 +1,6 @@
 package com.gabbasov.meterscan.meters.presentation.details.tabs
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.gabbasov.meterscan.meters.domain.Meter
 import com.gabbasov.meterscan.meters.domain.MeterReading
 import com.gabbasov.meterscan.meters.domain.MeterType
+import com.gabbasov.meterscan.meters.presentation.details.calculateMonthlyConsumption
 import com.gabbasov.meterscan.meters.presentation.details.calculateYearConsumption
 import com.gabbasov.meterscan.meters.presentation.details.components.ReadingListItem
 import com.gabbasov.meterscan.meters.presentation.details.components.YearConsumptionChart
@@ -96,108 +98,124 @@ fun ReadingsHistoryTab(meter: Meter) {
         it.date.year == selectedYear
     }.sortedBy { it.date }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         // 1. Блок выбора года
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showYearPicker = true }
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = "Выберите год",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
-                )
-
-                Text(
-                    text = selectedYear.toString(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Icon(
-                    imageVector = Icons.Default.DateRange,
-                    contentDescription = "Выбрать год"
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 2. Блок с графиком
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = "Показания за $selectedYear год",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                val totalYearConsumption = calculateYearConsumption(yearReadings)
-                Text(
-                    text = "Суммарно за год: $totalYearConsumption ${getMeterUnits(meter.type)}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                if (yearReadings.isEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showYearPicker = true }
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
-                        text = "Нет данных за $selectedYear год",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 32.dp),
-                        textAlign = TextAlign.Center
+                        text = "Выберите год",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f)
                     )
-                } else {
-                    // График с сокращенными названиями месяцев
-                    YearConsumptionChart(
-                        readings = yearReadings,
-                        meterType = meter.type
+
+                    Text(
+                        text = selectedYear.toString(),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Выбрать год"
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // 2. Блок с графиком
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = "Показания за $selectedYear год",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    val totalYearConsumption = calculateYearConsumption(yearReadings)
+                    Text(
+                        text = "Суммарно за год: $totalYearConsumption ${getMeterUnits(meter.type)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    if (yearReadings.isEmpty()) {
+                        Text(
+                            text = "Нет данных за $selectedYear год",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 32.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    } else {
+                        // График с сокращенными названиями месяцев
+                        YearConsumptionChart(
+                            modifier = Modifier.height(200.dp),
+                            readings = yearReadings,
+                            meterType = meter.type
+                        )
+                    }
+                }
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
 
         // 3. Список показаний по месяцам
         if (yearReadings.isNotEmpty()) {
-            Text(
-                text = "Детализация по месяцам",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
-            )
+            item {
+                Text(
+                    text = "Детализация по месяцам",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
+                )
+            }
 
-            LazyColumn {
-                items(yearReadings.sortedByDescending { it.date }) { reading ->
-                    ReadingListItem(reading = reading, meterType = meter.type)
-                    androidx.compose.material3.Divider()
-                }
+            items(yearReadings.sortedByDescending { it.date }) { reading ->
+                val consumptionMap = calculateMonthlyConsumption(yearReadings)
+                val consumption = consumptionMap[reading.date] ?: 0.0
+
+                ReadingListItem(
+                    reading = reading,
+                    meterType = meter.type,
+                    consumption = consumption
+                )
+                androidx.compose.material3.Divider()
             }
         }
     }
