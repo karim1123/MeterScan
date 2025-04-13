@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -20,21 +17,22 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,14 +41,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gabbasov.meterscan.meters.domain.Meter
 import com.gabbasov.meterscan.meters.domain.MeterReading
-import com.gabbasov.meterscan.meters.presentation.components.ComposeReadingsChart
+import com.gabbasov.meterscan.meters.domain.MeterType
+import com.gabbasov.meterscan.meters.presentation.components.MeterTypeIcon
+import com.gabbasov.meterscan.meters.presentation.details.tabs.AboutMeterTab
+import com.gabbasov.meterscan.meters.presentation.details.tabs.ReadingsHistoryTab
 import kotlinx.coroutines.launch
-import java.time.format.DateTimeFormatter
+import java.time.Month
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -126,13 +126,6 @@ internal fun MeterDetailScreenRoute(
                 }
             )
         },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { coordinator.onAddReading() },
-                text = { Text("Добавить показания") },
-                icon = { Icon(Icons.Filled.Edit, contentDescription = "Добавить") }
-            )
-        },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         if (state.isLoading) {
@@ -146,7 +139,7 @@ internal fun MeterDetailScreenRoute(
             }
         } else {
             state.meter?.let { meter ->
-                MeterDetailScreen(
+                RedesignedMeterDetailScreen(
                     modifier = Modifier.padding(paddingValues),
                     meter = meter
                 )
@@ -168,136 +161,122 @@ internal fun MeterDetailScreenRoute(
 }
 
 @Composable
-private fun MeterDetailScreen(
+private fun RedesignedMeterDetailScreen(
     modifier: Modifier = Modifier,
     meter: Meter
 ) {
+    val tabs = listOf("О приборе", "История показаний")
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
     ) {
-
-        // Информация о счетчике
+        // Верхний блок с заголовком и номером счетчика
         Card(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
             ) {
                 Text(
-                    text = "Основная информация",
+                    text = "Счетчик",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                InfoRow(label = "Номер счетчика:", value = meter.number)
-                InfoRow(label = "Адрес:", value = meter.address)
-                InfoRow(label = "Владелец:", value = meter.owner)
-                InfoRow(
-                    label = "Дата установки:",
-                    value = meter.installationDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                )
-                InfoRow(
-                    label = "Дата следующей поверки:",
-                    value = meter.nextCheckDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = "№ ${meter.number}",
+                            style = MaterialTheme.typography.titleMedium
+                        )
 
-                meter.notes?.let {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Divider()
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Примечания:",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.bodyMedium
+                        Text(
+                            text = getMeterTypeText(meter.type),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    MeterTypeIcon(
+                        type = meter.type,
+                        size = 40f
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // График показаний
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = "История показаний",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
+        // Табы
+        TabRow(selectedTabIndex = selectedTabIndex) {
+            tabs.forEachIndexed { index, title ->
+                Tab(
+                    text = { Text(title) },
+                    selected = selectedTabIndex == index,
+                    onClick = { selectedTabIndex = index }
                 )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                if (meter.readings.isEmpty()) {
-                    Text(
-                        text = "Нет зарегистрированных показаний",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 32.dp),
-                        textAlign = TextAlign.Center
-                    )
-                } else {
-                    // Используем новый компонент с ComposeCharts
-                    ComposeReadingsChart(
-                        readings = meter.readings.map {
-                            MeterReading(it.date, it.value)
-                        },
-                        meterType = meter.type
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = "Последние показания: ${meter.readings.lastOrNull()?.value ?: "Нет данных"}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
             }
+        }
+
+        // Содержимое табов
+        when (selectedTabIndex) {
+            0 -> AboutMeterTab(meter)
+            1 -> ReadingsHistoryTab(meter)
         }
     }
 }
 
-@Composable
-private fun InfoRow(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.width(160.dp)
-        )
+// Вспомогательные функции
 
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium
-        )
+fun getMeterTypeText(type: MeterType): String {
+    return when (type) {
+        MeterType.ELECTRICITY -> "Счетчик электроэнергии"
+        MeterType.WATER -> "Счетчик воды"
+        MeterType.GAS -> "Счетчик газа"
     }
+}
+
+fun getMeterUnits(type: MeterType): String {
+    return when (type) {
+        MeterType.ELECTRICITY -> "кВт·ч"
+        MeterType.WATER -> "м³"
+        MeterType.GAS -> "м³"
+    }
+}
+
+fun calculateYearConsumption(readings: List<MeterReading>): Double {
+    if (readings.isEmpty()) return 0.0
+
+    // Предполагаем, что мы хотим посчитать разницу между последним и первым показанием за год
+    val sortedReadings = readings.sortedBy { it.date }
+    return if (sortedReadings.size >= 2) {
+        sortedReadings.last().value - sortedReadings.first().value
+    } else {
+        sortedReadings.firstOrNull()?.value ?: 0.0
+    }
+}
+
+fun prepareMonthlyData(readings: List<MeterReading>): Map<Month, MeterReading?> {
+    // Создаем мапу для всех месяцев года
+    val monthsMap = Month.values().associateWith { null as MeterReading? }
+
+    // Добавляем актуальные показания (берем последнее показание за каждый месяц)
+    val monthlyReadings = readings
+        .groupBy { it.date.month }
+        .mapValues { (_, monthReadings) ->
+            monthReadings.maxByOrNull { it.date.dayOfMonth }
+        }
+
+    // Объединяем все месяцы с имеющимися показаниями
+    return monthsMap + monthlyReadings
 }

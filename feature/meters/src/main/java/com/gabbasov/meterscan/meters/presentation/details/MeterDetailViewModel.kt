@@ -45,10 +45,13 @@ internal class MeterDetailViewModel(
                         error = null
                     )
                 }
+
                 is Resource.Error -> {
                     state = state.copy(
                         isLoading = false,
-                        error = Text.RawString(result.exception.message ?: "Ошибка загрузки счетчика")
+                        error = Text.RawString(
+                            result.exception.message ?: "Ошибка загрузки счетчика"
+                        )
                     )
                 }
             }
@@ -64,6 +67,7 @@ internal class MeterDetailViewModel(
                 // Обработка успешного удаления выполняется в координаторе
                 state = state.copy(isLoading = false)
             }
+
             is Resource.Error -> {
                 state = state.copy(
                     isLoading = false,

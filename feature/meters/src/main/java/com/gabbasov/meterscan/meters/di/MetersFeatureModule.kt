@@ -1,8 +1,8 @@
 package com.gabbasov.meterscan.meters.di
 
 import androidx.room.Room
-import com.gabbasov.meterscan.meters.data.MetersRepositoryImpl
 import com.gabbasov.meterscan.features.MetersFeatureApi
+import com.gabbasov.meterscan.meters.data.MetersRepositoryImpl
 import com.gabbasov.meterscan.meters.data.db.MeterScanDatabase
 import com.gabbasov.meterscan.meters.data.db.mock.MockDataProvider
 import com.gabbasov.meterscan.meters.domain.MetersRepository

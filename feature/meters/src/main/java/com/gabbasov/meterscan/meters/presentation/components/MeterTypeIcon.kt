@@ -30,10 +30,12 @@ fun MeterTypeIcon(
             R.drawable.ic_electricity,
             Color(0xFFFFC107) // Желтый для электричества
         )
+
         MeterType.WATER -> Pair(
             R.drawable.ic_water,
             Color(0xFF2196F3) // Синий для воды
         )
+
         MeterType.GAS -> Pair(
             R.drawable.ic_gas,
             Color(0xFFFF5722) // Оранжевый для газа

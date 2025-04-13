@@ -1,29 +1,31 @@
-package com.gabbasov.meterscan.meters.presentation.components
+package com.gabbasov.meterscan.meters.presentation.details.components
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.gabbasov.meterscan.meters.domain.MeterReading
 import com.gabbasov.meterscan.meters.domain.MeterType
+import com.gabbasov.meterscan.meters.presentation.details.prepareMonthlyData
 import ir.ehsannarmani.compose_charts.ColumnChart
 import ir.ehsannarmani.compose_charts.models.BarProperties
 import ir.ehsannarmani.compose_charts.models.Bars
 import ir.ehsannarmani.compose_charts.models.DrawStyle
-import java.time.format.DateTimeFormatter
+import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
+import ir.ehsannarmani.compose_charts.models.LabelProperties
+import java.time.format.TextStyle
+import java.util.Locale
 
 @Composable
-fun ComposeReadingsChart(
+fun YearConsumptionChart(
     readings: List<MeterReading>,
-    meterType: MeterType,
-    modifier: Modifier = Modifier
+    meterType: MeterType
 ) {
     // Определяем цвет для графика в зависимости от типа счетчика
     val mainColor = when (meterType) {
@@ -35,46 +37,60 @@ fun ComposeReadingsChart(
     // Создаем градиент для столбцов
     val chartBrush = Brush.verticalGradient(
         colors = listOf(
-            mainColor.copy(alpha = 0.8f),
+            mainColor.copy(alpha = 0.7f),
             mainColor
         )
     )
 
-    // Форматируем даты для отображения на оси X
-    val dateFormatter = DateTimeFormatter.ofPattern("dd.MM")
-
-    // Подготавливаем данные для графика
-    val chartData = readings.map { reading ->
+    // Подготавливаем данные по месяцам, включая пустые месяцы
+    val monthlyData = prepareMonthlyData(readings).map { (month, reading) ->
         Bars(
-            label = reading.date.format(dateFormatter),
+            label = month.getDisplayName(TextStyle.SHORT, Locale("ru")).take(3).uppercase(),
             values = listOf(
                 Bars.Data(
                     label = "Показания",
-                    value = reading.value,
+                    value = reading?.value ?: 0.0,
                     color = chartBrush
                 )
             )
         )
     }
 
+    // Отображаем график
     ColumnChart(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .height(250.dp)
-            .padding(horizontal = 16.dp),
-        data = remember { chartData },
+            .padding(bottom = 16.dp),
+        data = monthlyData,
         barProperties = BarProperties(
-            thickness = 20.dp,
-            spacing = 3.dp,
+            thickness = 16.dp,
+            spacing = 4.dp,
             cornerRadius = Bars.Data.Radius.Rectangle(
                 topRight = 6.dp,
                 topLeft = 6.dp
             ),
             style = DrawStyle.Fill
         ),
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        )
+        labelProperties = LabelProperties(
+            textStyle = androidx.compose.ui.text.TextStyle.Default.copy(
+                color = Color.White,
+                fontSize = 12.sp
+            ),
+            enabled = true,
+            rotation = LabelProperties.Rotation(mode = LabelProperties.Rotation.Mode.Force)
+        ),
+        indicatorProperties = HorizontalIndicatorProperties(enabled = false)
+    )
+}
+
+@Preview
+@Composable
+fun YearConsumptionChartPreview() {
+    YearConsumptionChart(
+        readings = listOf(
+            MeterReading(date = java.time.LocalDate.now(), value = 100.0),
+            MeterReading(date = java.time.LocalDate.now().minusMonths(1), value = 200.0)
+        ),
+        meterType = MeterType.ELECTRICITY
     )
 }

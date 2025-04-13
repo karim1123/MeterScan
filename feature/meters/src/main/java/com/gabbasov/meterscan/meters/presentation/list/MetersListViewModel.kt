@@ -51,7 +51,9 @@ internal class MetersListViewModel(
                 is Resource.Error -> {
                     state.copy(
                         isLoading = false,
-                        error = Text.RawString(result.exception.message ?: "Ошибка загрузки счетчиков")
+                        error = Text.RawString(
+                            result.exception.message ?: "Ошибка загрузки счетчиков"
+                        )
                     )
                 }
             }
