@@ -1,5 +1,6 @@
 package com.gabbasov.meterscan.meters.presentation.details
 
+import android.util.Log
 import com.gabbasov.meterscan.meters.domain.MeterReading
 import com.gabbasov.meterscan.meters.domain.MeterType
 import java.time.LocalDate
@@ -64,10 +65,32 @@ fun prepareMonthlyData(readings: List<MeterReading>): Map<Month, Double> {
         }
         .filterValues { it != null }
         .mapValues { it.value!! }
-        .toSortedMap(compareBy { it.value })
+        .toSortedMap() // Естественный порядок месяцев
 
     // Convert readings to consumption (difference between consecutive months)
     val sortedMonths = monthlyReadings.keys.toList()
+
+    // Проверка наличия данных за декабрь предыдущего года
+    val decemberLastYear = readings
+        .filter { it.date.year == readings.first().date.year - 1 && it.date.month == Month.DECEMBER }
+        .maxByOrNull { it.date }
+
+    // Обработка января (если есть)
+    if (sortedMonths.contains(Month.JANUARY)) {
+        val januaryReading = monthlyReadings[Month.JANUARY]!!
+
+        if (decemberLastYear != null) {
+            // Если есть данные за декабрь прошлого года, расчитываем разницу
+            val consumption = januaryReading.value - decemberLastYear.value
+            if (consumption > 0) {
+                monthlyConsumption[Month.JANUARY] = consumption
+            }
+        } else {
+            // Если нет данных за декабрь, используем среднее потребление для других месяцев
+            // или можно установить в качестве потребления само значение
+            monthlyConsumption[Month.JANUARY] = januaryReading.value / 12.0 // примерное деление на количество месяцев
+        }
+    }
 
     for (i in 1 until sortedMonths.size) {
         val currentMonth = sortedMonths[i]
@@ -77,18 +100,66 @@ fun prepareMonthlyData(readings: List<MeterReading>): Map<Month, Double> {
         val previousReading = monthlyReadings[previousMonth]!!
 
         val consumption = currentReading.value - previousReading.value
-        if (consumption > 0) {  // Ignore negative values (meter reset or replacement)
+        if (consumption > 0) {
             monthlyConsumption[currentMonth] = consumption
         }
     }
+
+    Log.d("test312", "monthlyConsumption: $monthlyConsumption")
 
     return monthlyConsumption
 }
 
 fun calculateMonthlyConsumption(readings: List<MeterReading>): Map<LocalDate, Double> {
+    // Сортируем показания по дате
     val sortedReadings = readings.sortedBy { it.date }
     val consumption = mutableMapOf<LocalDate, Double>()
 
+    // Проверим, есть ли у нас декабрь предыдущего года для расчета января
+    val decemberLastYear = sortedReadings
+        .firstOrNull()
+        ?.let { firstReading ->
+            readings.filter { it.date.year == firstReading.date.year - 1 && it.date.month == Month.DECEMBER }
+                .maxByOrNull { it.date }
+        }
+
+    // Обрабатываем первое показание (вероятно январь)
+    if (sortedReadings.isNotEmpty()) {
+        val firstReading = sortedReadings.first()
+
+        if (firstReading.date.month == Month.JANUARY) {
+            if (decemberLastYear != null) {
+                // Если у нас есть декабрь прошлого года, можем вычислить потребление для января
+                val diff = firstReading.value - decemberLastYear.value
+                if (diff > 0) {
+                    consumption[firstReading.date] = diff
+                }
+            } else {
+                // Если нет декабря прошлого года, используем среднее потребление
+                // или установим примерное значение
+                val avgConsumption = if (sortedReadings.size > 2) {
+                    // Среднее потребление из других месяцев
+                    var total = 0.0
+                    var count = 0
+                    for (i in 1 until sortedReadings.size) {
+                        val diff = sortedReadings[i].value - sortedReadings[i-1].value
+                        if (diff > 0) {
+                            total += diff
+                            count++
+                        }
+                    }
+                    if (count > 0) total / count else firstReading.value / 12.0
+                } else {
+                    // Если нет данных для расчета среднего, используем простую оценку
+                    firstReading.value / 12.0 // Примерное значение
+                }
+
+                consumption[firstReading.date] = avgConsumption
+            }
+        }
+    }
+
+    // Рассчитываем потребление для остальных месяцев
     for (i in 1 until sortedReadings.size) {
         val current = sortedReadings[i]
         val previous = sortedReadings[i-1]

@@ -1,6 +1,5 @@
 package com.gabbasov.meterscan.meters.presentation.details.tabs
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +17,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -215,7 +215,7 @@ fun ReadingsHistoryTab(meter: Meter) {
                     meterType = meter.type,
                     consumption = consumption
                 )
-                androidx.compose.material3.Divider()
+                HorizontalDivider()
             }
         }
     }
