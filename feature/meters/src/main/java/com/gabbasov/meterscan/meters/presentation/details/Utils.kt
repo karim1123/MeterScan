@@ -1,6 +1,5 @@
 package com.gabbasov.meterscan.meters.presentation.details
 
-import android.util.Log
 import com.gabbasov.meterscan.meters.domain.MeterReading
 import com.gabbasov.meterscan.meters.domain.MeterType
 import java.time.LocalDate
@@ -41,7 +40,7 @@ fun calculateYearConsumption(readings: List<MeterReading>): Double {
     // Calculate the sum of monthly consumption
     var totalConsumption = 0.0
     for (i in 1 until monthlyReadings.size) {
-        val consumption = monthlyReadings[i].value - monthlyReadings[i-1].value
+        val consumption = monthlyReadings[i].value - monthlyReadings[i - 1].value
         if (consumption > 0) {  // Only add positive consumption (to handle reset or replacement cases)
             totalConsumption += consumption
         }
@@ -88,13 +87,14 @@ fun prepareMonthlyData(readings: List<MeterReading>): Map<Month, Double> {
         } else {
             // Если нет данных за декабрь, используем среднее потребление для других месяцев
             // или можно установить в качестве потребления само значение
-            monthlyConsumption[Month.JANUARY] = januaryReading.value / 12.0 // примерное деление на количество месяцев
+            monthlyConsumption[Month.JANUARY] =
+                januaryReading.value / 12.0 // примерное деление на количество месяцев
         }
     }
 
     for (i in 1 until sortedMonths.size) {
         val currentMonth = sortedMonths[i]
-        val previousMonth = sortedMonths[i-1]
+        val previousMonth = sortedMonths[i - 1]
 
         val currentReading = monthlyReadings[currentMonth]!!
         val previousReading = monthlyReadings[previousMonth]!!
@@ -104,8 +104,6 @@ fun prepareMonthlyData(readings: List<MeterReading>): Map<Month, Double> {
             monthlyConsumption[currentMonth] = consumption
         }
     }
-
-    Log.d("test312", "monthlyConsumption: $monthlyConsumption")
 
     return monthlyConsumption
 }
@@ -142,7 +140,7 @@ fun calculateMonthlyConsumption(readings: List<MeterReading>): Map<LocalDate, Do
                     var total = 0.0
                     var count = 0
                     for (i in 1 until sortedReadings.size) {
-                        val diff = sortedReadings[i].value - sortedReadings[i-1].value
+                        val diff = sortedReadings[i].value - sortedReadings[i - 1].value
                         if (diff > 0) {
                             total += diff
                             count++
@@ -162,7 +160,7 @@ fun calculateMonthlyConsumption(readings: List<MeterReading>): Map<LocalDate, Do
     // Рассчитываем потребление для остальных месяцев
     for (i in 1 until sortedReadings.size) {
         val current = sortedReadings[i]
-        val previous = sortedReadings[i-1]
+        val previous = sortedReadings[i - 1]
         val diff = current.value - previous.value
 
         if (diff > 0) {

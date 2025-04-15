@@ -3,7 +3,7 @@ package com.gabbasov.meterscan.meters.presentation.details
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
-import com.gabbasov.meterscan.meters.presentation.navigation.MeterRoutes
+import com.gabbasov.meterscan.NavigationRoute
 import org.koin.androidx.compose.koinViewModel
 
 internal class MeterDetailCoordinator(
@@ -19,20 +19,12 @@ internal class MeterDetailCoordinator(
     fun onAddReading() {
         viewModel.execute(MeterDetailAction.AddReading)
         state.value.meter?.id?.let { meterId ->
-            navController.navigate("${MeterRoutes.ADD_READING}/$meterId")
-        }
-    }
-
-    fun onEditMeter() {
-        viewModel.execute(MeterDetailAction.EditMeter)
-        state.value.meter?.id?.let { meterId ->
-            navController.navigate("${MeterRoutes.EDIT_METER}/$meterId")
+            navController.navigate("${NavigationRoute.ADD_READING}/$meterId")
         }
     }
 
     fun onDeleteMeter() {
         viewModel.execute(MeterDetailAction.DeleteMeter)
-        // После успешного удаления вернуться к списку
         navController.popBackStack()
     }
 

@@ -2,8 +2,8 @@ package com.gabbasov.meterscan.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gabbasov.meterscan.auth.domain.AuthRepository
+import com.gabbasov.meterscan.features.MainScreenFeatureApi
 import com.gabbasov.meterscan.features.MetersFeatureApi
 import com.gabbasov.meterscan.features.SignInFeatureApi
 import com.gabbasov.meterscan.features.SignUpFeatureApi
@@ -21,6 +21,7 @@ class MainActivityViewModel(
     val signUpApi: SignUpFeatureApi,
     val signInApi: SignInFeatureApi,
     val metersFeatureApi: MetersFeatureApi,
+    val mainScreenApi: MainScreenFeatureApi,
 ) : ViewModel() {
 
     val isAuthorized = authRepository.getCurrentUser()

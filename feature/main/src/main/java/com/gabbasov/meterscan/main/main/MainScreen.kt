@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.main.presentation.main
+package com.gabbasov.meterscan.main.main
 
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+/*
 
 @Composable
 fun CameraScreen(
@@ -85,3 +86,4 @@ fun CameraScreen(
         }
     }
 }
+*/

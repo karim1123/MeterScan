@@ -2,8 +2,8 @@ package com.gabbasov.meterscan.meters.presentation.list
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import com.gabbasov.meterscan.NavigationRoute
 import androidx.navigation.NavHostController
-import com.gabbasov.meterscan.meters.presentation.navigation.MeterRoutes
 import org.koin.androidx.compose.koinViewModel
 
 internal class MetersListCoordinator(
@@ -14,12 +14,7 @@ internal class MetersListCoordinator(
 
     fun onMeterSelected(meterId: String) {
         viewModel.execute(MetersListAction.MeterSelected(meterId))
-        navController.navigate("${MeterRoutes.METER_DETAILS}/$meterId")
-    }
-
-    fun onAddNewMeter() {
-        viewModel.execute(MetersListAction.AddNewMeter)
-        navController.navigate(MeterRoutes.ADD_METER)
+        navController.navigate("${NavigationRoute.METER_DETAILS}/$meterId")
     }
 
     fun onRefresh() {

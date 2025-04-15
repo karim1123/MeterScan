@@ -23,7 +23,7 @@ fun MeterScanNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = if (isAuthorized) viewModel.metersFeatureApi.meterListRoute() else viewModel.signInApi.signInRoute(),
+        startDestination = if (isAuthorized) viewModel.mainScreenApi.mainScreenRoute() else viewModel.signInApi.signInRoute(),
     ) {
         register(
             modifier = modifier,
@@ -39,6 +39,11 @@ fun MeterScanNavHost(
             modifier = modifier,
             navController = navController,
             featureApi = viewModel.metersFeatureApi,
+        )
+        register(
+            modifier = modifier,
+            navController = navController,
+            featureApi = viewModel.mainScreenApi,
         )
     }
 }

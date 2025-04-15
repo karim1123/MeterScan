@@ -26,7 +26,8 @@ class AuthDataSource(
     ): Resource<User> {
         return withContext(coroutineDispatchers.io) {
             try {
-                val authResult = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+                val authResult =
+                    firebaseAuth.createUserWithEmailAndPassword(email, password).await()
                 val user = authResult.user
                 if (user != null) {
                     Resource.Success(user.toUser())

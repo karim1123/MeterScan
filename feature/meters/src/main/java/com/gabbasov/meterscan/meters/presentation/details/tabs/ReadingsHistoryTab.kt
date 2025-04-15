@@ -1,5 +1,7 @@
 package com.gabbasov.meterscan.meters.presentation.details.tabs
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -101,7 +103,7 @@ fun ReadingsHistoryTab(meter: Meter) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
     ) {
         item {
             Card(
