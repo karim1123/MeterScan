@@ -41,6 +41,14 @@ internal class SignInCoordinator(
     fun onNavigateToSignUp() {
         navController.navigate(viewModel.signUpApi.signUpRoute())
     }
+
+    fun onNavigateToMainScreen() {
+        navController.navigate(viewModel.mainScreenApi.mainScreenRoute()) {
+            popUpTo(navController.graph.startDestinationId) {
+                saveState = true
+            }
+        }
+    }
 }
 
 @Composable

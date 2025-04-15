@@ -21,10 +21,9 @@ class MainActivity : ComponentActivity() {
             MeterScanTheme {
                 KoinAndroidContext {
                     Box(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.background),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background),
                     ) {
                         MeterScanNavHost()
                     }

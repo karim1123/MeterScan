@@ -48,6 +48,12 @@ internal fun SignInScreenRoute(
         }
     }
 
+    LaunchedEffect(state.navigateToMainScreen) {
+        if (state.navigateToMainScreen) {
+            coordinator.onNavigateToMainScreen()
+        }
+    }
+
     MeterScanTheme {
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) }

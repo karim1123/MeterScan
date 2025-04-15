@@ -1,6 +1,9 @@
 [versions]
+accompanistNavigationAnimation = "0.30.1"
 agp = "8.8.0"
-firebaseBom = "33.8.0"
+cameraCore = "1.4.1"
+composeCharts = "0.1.2"
+firebaseBom = "33.12.0"
 kotlin = "2.1.0"
 coreKtx = "1.15.0"
 ksp = "2.1.0-1.0.29"
@@ -8,23 +11,30 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.10.0"
-composeBom = "2025.01.00"
+activityCompose = "1.10.1"
+composeBom = "2025.04.00"
 ktlint = "12.1.2"
 detekt = "1.23.7"
 appcompat = "1.7.0"
 material = "1.12.0"
-composeMaterial3 = "1.3.1"
+composeMaterial3 = "1.3.2"
 gms = "4.4.2"
 koin-bom = "4.0.0"
-jetbrainsKotlinJvm = "1.9.24"
-navigationRuntimeKtx = "2.8.5"
+jetbrainsKotlinJvm = "2.1.0"
+materialVersion = "1.8.0-rc03"
+navigationRuntimeKtx = "2.8.6"
 timber = "5.0.1"
-navigationCompose = "2.8.5"
+navigationCompose = "2.8.6"
+cameraX = "1.4.1"
+room = "2.7.0"
+coil = "2.5.0"
 
 [libraries]
+accompanist-navigation-animation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanistNavigationAnimation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-foundation = { module = "androidx.compose.foundation:foundation" }
+androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
+compose-charts = { module = "io.github.ehsannarmani:compose-charts", version.ref = "composeCharts" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -54,6 +64,18 @@ koin-core = { module = "io.insert-koin:koin-core" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraX" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraX" }
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraX" }
+androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraX" }
+
+# Room
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+
+# Coil для Compose
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -64,3 +86,4 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 google-services = { id = "com.google.gms.google-services", version.ref = "gms" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

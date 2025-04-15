@@ -12,6 +12,7 @@ internal data class SignInState(
     val content: SignInData = SignInData(),
     override val isLoading: Boolean = false,
     override val error: Text? = null,
+    val navigateToMainScreen: Boolean = false,
 ) : BaseState()
 
 @Stable

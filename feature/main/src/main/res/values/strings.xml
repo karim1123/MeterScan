@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_camera">Камера</string>
+    <string name="tab_work">Работа</string>
+    <string name="tab_meters">Счетчики</string>
+    <string name="tab_settings">Настройки</string>
+</resources>

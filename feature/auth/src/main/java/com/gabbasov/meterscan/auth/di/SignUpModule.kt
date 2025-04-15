@@ -22,5 +22,5 @@ val signUpFeatureMode = module {
     single { SignUpUseCase(get()) }
     single { SignInUseCase(get()) }
     viewModel { SignUpViewModel(get()) }
-    viewModel { SignInViewModel(get(), get()) }
+    viewModel { SignInViewModel(get(), get(), get()) }
 }
