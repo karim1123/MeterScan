@@ -1,9 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="error_empty_email">Email cannot be empty</string>
-    <string name="error_invalid_email">Invalid email format</string>
-    <string name="error_empty_password">Password cannot be empty</string>
-    <string name="error_short_password">Password must be at least 6 characters</string>
-    <string name="error_passwords_do_not_match">Passwords do not match</string>
-    <string name="error_unknown">Unknown error</string>
 </resources>

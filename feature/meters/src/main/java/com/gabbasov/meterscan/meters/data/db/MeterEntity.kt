@@ -3,8 +3,8 @@ package com.gabbasov.meterscan.meters.data.db
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.gabbasov.meterscan.meters.domain.Meter
-import com.gabbasov.meterscan.meters.domain.MeterType
+import com.gabbasov.meterscan.model.meter.Meter
+import com.gabbasov.meterscan.model.meter.MeterType
 import java.time.LocalDate
 import java.util.UUID
 

@@ -3,7 +3,7 @@ package com.gabbasov.meterscan.meters.data.db.mock
 import com.gabbasov.meterscan.meters.data.db.MeterEntity
 import com.gabbasov.meterscan.meters.data.db.MeterScanDatabase
 import com.gabbasov.meterscan.meters.data.db.ReadingEntity
-import com.gabbasov.meterscan.meters.domain.MeterType
+import com.gabbasov.meterscan.model.meter.MeterType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate

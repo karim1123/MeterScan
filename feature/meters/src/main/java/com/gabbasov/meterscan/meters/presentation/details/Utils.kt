@@ -1,7 +1,7 @@
 package com.gabbasov.meterscan.meters.presentation.details
 
-import com.gabbasov.meterscan.meters.domain.MeterReading
-import com.gabbasov.meterscan.meters.domain.MeterType
+import com.gabbasov.meterscan.model.meter.MeterReading
+import com.gabbasov.meterscan.model.meter.MeterType
 import java.time.LocalDate
 import java.time.Month
 

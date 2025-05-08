@@ -1,10 +1,10 @@
 package com.gabbasov.meterscan.auth.presentation.signup
 
 import androidx.lifecycle.viewModelScope
-import com.gabbasov.meterscan.auth.User
+import com.gabbasov.meterscan.model.auth.User
 import com.gabbasov.meterscan.auth.data.repository.SignUpUseCase
 import com.gabbasov.meterscan.network.Errors
-import com.gabbasov.meterscan.network.Resource
+import com.gabbasov.meterscan.base.Resource
 import com.gabbasov.meterscan.ui.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

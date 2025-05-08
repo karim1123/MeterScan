@@ -3,7 +3,7 @@ package com.gabbasov.meterscan.meters.presentation.details
 import androidx.compose.runtime.Stable
 import com.gabbasov.meterscan.domain.BaseAction
 import com.gabbasov.meterscan.domain.BaseState
-import com.gabbasov.meterscan.meters.domain.Meter
+import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.ui.Text
 
 @Stable

@@ -3,7 +3,7 @@ package com.gabbasov.meterscan.auth.di
 import com.gabbasov.meterscan.auth.data.repository.AuthRepositoryImpl
 import com.gabbasov.meterscan.auth.data.repository.SignInUseCase
 import com.gabbasov.meterscan.auth.data.repository.SignUpUseCase
-import com.gabbasov.meterscan.auth.domain.AuthRepository
+import com.gabbasov.meterscan.repository.AuthRepository
 import com.gabbasov.meterscan.auth.presentation.signin.SignInViewModel
 import com.gabbasov.meterscan.auth.presentation.signin.navigation.SignInNavigation
 import com.gabbasov.meterscan.auth.presentation.signup.SignUpViewModel

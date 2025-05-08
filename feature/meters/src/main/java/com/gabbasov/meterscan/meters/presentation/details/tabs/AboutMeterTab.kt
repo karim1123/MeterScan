@@ -16,9 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.gabbasov.meterscan.meters.domain.Meter
-import com.gabbasov.meterscan.meters.domain.MeterReading
-import com.gabbasov.meterscan.meters.domain.MeterType
+import com.gabbasov.meterscan.model.meter.Meter
+import com.gabbasov.meterscan.model.meter.MeterReading
+import com.gabbasov.meterscan.model.meter.MeterType
 import com.gabbasov.meterscan.meters.presentation.details.components.InfoRow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

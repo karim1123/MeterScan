@@ -4,9 +4,9 @@ import com.gabbasov.meterscan.meters.data.db.MeterDao
 import com.gabbasov.meterscan.meters.data.db.MeterEntity
 import com.gabbasov.meterscan.meters.data.db.ReadingDao
 import com.gabbasov.meterscan.meters.data.db.ReadingEntity
-import com.gabbasov.meterscan.meters.domain.Meter
-import com.gabbasov.meterscan.meters.domain.MetersRepository
-import com.gabbasov.meterscan.network.Resource
+import com.gabbasov.meterscan.model.meter.Meter
+import com.gabbasov.meterscan.repository.MetersRepository
+import com.gabbasov.meterscan.base.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine

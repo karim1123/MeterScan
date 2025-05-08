@@ -1,8 +1,9 @@
 package com.gabbasov.meterscan.auth
 
 import com.gabbasov.meterscan.auth.mapper.toUser
+import com.gabbasov.meterscan.model.auth.User
 import com.gabbasov.meterscan.network.CoroutineDispatchers
-import com.gabbasov.meterscan.network.Resource
+import com.gabbasov.meterscan.base.Resource
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -11,7 +12,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 class AuthDataSource(
-    private val firebaseAuth: FirebaseAuth,
+    val firebaseAuth: FirebaseAuth,
     private val coroutineDispatchers: CoroutineDispatchers,
 ) {
     /**

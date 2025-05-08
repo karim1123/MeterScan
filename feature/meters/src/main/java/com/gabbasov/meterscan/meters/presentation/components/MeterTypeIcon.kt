@@ -17,7 +17,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gabbasov.meterscan.meters.R
-import com.gabbasov.meterscan.meters.domain.MeterType
+import com.gabbasov.meterscan.model.meter.MeterType
 
 @Composable
 fun MeterTypeIcon(

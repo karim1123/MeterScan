@@ -15,9 +15,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.gabbasov.meterscan.meters.domain.MeterReading
-import com.gabbasov.meterscan.meters.domain.MeterType
+import com.gabbasov.meterscan.model.meter.MeterReading
+import com.gabbasov.meterscan.model.meter.MeterType
 import com.gabbasov.meterscan.meters.presentation.details.getMeterUnits
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -73,7 +74,7 @@ fun ReadingListItemPreview() {
     MaterialTheme {
         ReadingListItem(
             reading = MeterReading(
-                date = java.time.LocalDate.now(),
+                date = LocalDate.now(),
                 value = 123.45,
             ),
             meterType = MeterType.ELECTRICITY
