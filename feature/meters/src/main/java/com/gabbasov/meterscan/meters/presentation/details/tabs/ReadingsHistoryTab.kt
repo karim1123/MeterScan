@@ -1,7 +1,5 @@
 package com.gabbasov.meterscan.meters.presentation.details.tabs
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,9 +32,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.gabbasov.meterscan.meters.domain.Meter
-import com.gabbasov.meterscan.meters.domain.MeterReading
-import com.gabbasov.meterscan.meters.domain.MeterType
+import com.gabbasov.meterscan.model.meter.Meter
+import com.gabbasov.meterscan.model.meter.MeterReading
+import com.gabbasov.meterscan.model.meter.MeterType
 import com.gabbasov.meterscan.meters.presentation.details.calculateMonthlyConsumption
 import com.gabbasov.meterscan.meters.presentation.details.components.ReadingListItem
 import com.gabbasov.meterscan.meters.presentation.details.components.YearConsumptionChart

@@ -126,9 +126,11 @@ fun MainTabsNavHost(
             navController = navController,
             featureApi = viewModel.metersFeatureApi,
         )
-        composable(MainTab.SETTINGS.name) {
-            SettingsScreen(navController = navController)
-        }
+        register(
+            modifier = modifier,
+            navController = navController,
+            featureApi = viewModel.settingsFeatureApi,
+        )
     }
 }
 

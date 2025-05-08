@@ -1,10 +1,13 @@
 package com.gabbasov.meterscan.auth.data.repository
 
 import com.gabbasov.meterscan.auth.AuthDataSource
-import com.gabbasov.meterscan.auth.User
-import com.gabbasov.meterscan.auth.domain.AuthRepository
-import com.gabbasov.meterscan.network.Resource
+import com.gabbasov.meterscan.model.auth.User
+import com.gabbasov.meterscan.repository.AuthRepository
+import com.gabbasov.meterscan.base.Resource
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 internal class AuthRepositoryImpl(
     private val authDataSource: AuthDataSource,
@@ -39,5 +42,14 @@ internal class AuthRepositoryImpl(
 
     override fun getCurrentUser(): Flow<Resource<User?>> {
         return authDataSource.getCurrentUser()
+    }
+
+    override suspend fun signOut(): Resource<Unit> = withContext(Dispatchers.IO) {
+        try {
+            authDataSource.firebaseAuth.signOut()
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(Exception("Ошибка выхода: ${e.message}"))
+        }
     }
 }

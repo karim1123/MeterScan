@@ -35,7 +35,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:model"))
+    implementation(project(":core:domain"))
     implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:network"))
@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.accompanist.navigation.animation)
+    implementation(libs.firebase.auth.ktx)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.timber)
 

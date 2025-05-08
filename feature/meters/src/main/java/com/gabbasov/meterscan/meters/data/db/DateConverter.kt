@@ -1,7 +1,7 @@
 package com.gabbasov.meterscan.meters.data.db
 
 import androidx.room.TypeConverter
-import com.gabbasov.meterscan.meters.domain.MeterType
+import com.gabbasov.meterscan.model.meter.MeterType
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

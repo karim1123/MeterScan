@@ -6,6 +6,7 @@ composeCharts = "0.1.2"
 firebaseBom = "33.12.0"
 kotlin = "2.1.0"
 coreKtx = "1.15.0"
+kotlinxCoroutinesCore = "1.7.3"
 ksp = "2.1.0-1.0.29"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -28,6 +29,7 @@ navigationCompose = "2.8.6"
 cameraX = "1.4.1"
 room = "2.7.0"
 coil = "2.5.0"
+firebaseAuthKtx = "23.2.0"
 
 [libraries]
 accompanist-navigation-animation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanistNavigationAnimation" }
@@ -55,6 +57,7 @@ koin-android = { module = "io.insert-koin:koin-android" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
 koin-compose = { module = "io.insert-koin:koin-compose" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
@@ -76,6 +79,7 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 
 # Coil для Compose
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

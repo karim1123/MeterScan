@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.gabbasov.meterscan.presentation.MainActivityViewModel
 import com.gabbasov.meterscan.register
+import com.gabbasov.meterscan.settings.presentation.NavigationHolder
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import org.koin.androidx.compose.koinViewModel
 
@@ -19,6 +20,7 @@ fun MeterScanNavHost(
     navController: NavHostController = rememberAnimatedNavController(),
     viewModel: MainActivityViewModel = koinViewModel(),
 ) {
+    NavigationHolder.rootNavController = navController
     val isAuthorized by viewModel.isAuthorized.collectAsStateWithLifecycle(false)
 
     NavHost(

@@ -1,10 +1,10 @@
 package com.gabbasov.meterscan.auth.data.repository
 
 import android.util.Patterns
-import com.gabbasov.meterscan.auth.User
-import com.gabbasov.meterscan.auth.domain.AuthRepository
+import com.gabbasov.meterscan.model.auth.User
+import com.gabbasov.meterscan.repository.AuthRepository
 import com.gabbasov.meterscan.network.Errors
-import com.gabbasov.meterscan.network.Resource
+import com.gabbasov.meterscan.base.Resource
 
 const val MIN_PASSWORD_LENGTH = 6
 

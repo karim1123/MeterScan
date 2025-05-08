@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.gabbasov.meterscan.meters.domain.MeterReading
+import com.gabbasov.meterscan.model.meter.MeterReading
 import java.time.LocalDate
 import java.util.UUID
 

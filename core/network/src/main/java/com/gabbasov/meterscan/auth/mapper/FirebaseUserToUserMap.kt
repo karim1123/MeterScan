@@ -1,6 +1,6 @@
 package com.gabbasov.meterscan.auth.mapper
 
-import com.gabbasov.meterscan.auth.User
+import com.gabbasov.meterscan.model.auth.User
 import com.google.firebase.auth.FirebaseUser
 
 fun FirebaseUser.toUser(): User {

@@ -2,13 +2,13 @@ package com.gabbasov.meterscan.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gabbasov.meterscan.auth.domain.AuthRepository
+import com.gabbasov.meterscan.repository.AuthRepository
 import com.gabbasov.meterscan.features.MainScreenFeatureApi
 import com.gabbasov.meterscan.features.MetersFeatureApi
 import com.gabbasov.meterscan.features.SignInFeatureApi
 import com.gabbasov.meterscan.features.SignUpFeatureApi
 import com.gabbasov.meterscan.meters.data.db.mock.MockDataProvider
-import com.gabbasov.meterscan.network.Resource
+import com.gabbasov.meterscan.base.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map

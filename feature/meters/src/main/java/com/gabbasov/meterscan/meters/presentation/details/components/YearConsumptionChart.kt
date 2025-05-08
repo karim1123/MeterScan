@@ -11,8 +11,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.gabbasov.meterscan.meters.domain.MeterReading
-import com.gabbasov.meterscan.meters.domain.MeterType
+import com.gabbasov.meterscan.model.meter.MeterReading
+import com.gabbasov.meterscan.model.meter.MeterType
 import com.gabbasov.meterscan.meters.presentation.details.getMeterUnits
 import com.gabbasov.meterscan.meters.presentation.details.prepareMonthlyData
 import ir.ehsannarmani.compose_charts.ColumnChart
@@ -22,6 +22,7 @@ import ir.ehsannarmani.compose_charts.models.DrawStyle
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.PopupProperties
+import java.time.LocalDate
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.Locale
@@ -108,15 +109,15 @@ fun YearConsumptionChart(
 fun YearConsumptionChartPreview() {
     val readings = listOf(
         MeterReading(
-            date = java.time.LocalDate.of(2023, 1, 1),
+            date = LocalDate.of(2023, 1, 1),
             value = 100.0
         ),
         MeterReading(
-            date = java.time.LocalDate.of(2023, 2, 1),
+            date = LocalDate.of(2023, 2, 1),
             value = 150.0
         ),
         MeterReading(
-            date = java.time.LocalDate.of(2023, 3, 1),
+            date = LocalDate.of(2023, 3, 1),
             value = 200.0
         )
     )

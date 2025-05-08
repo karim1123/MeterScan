@@ -1,8 +1,8 @@
 package com.gabbasov.meterscan.meters.presentation.details
 
 import androidx.lifecycle.viewModelScope
-import com.gabbasov.meterscan.meters.domain.MetersRepository
-import com.gabbasov.meterscan.network.Resource
+import com.gabbasov.meterscan.repository.MetersRepository
+import com.gabbasov.meterscan.base.Resource
 import com.gabbasov.meterscan.ui.BaseViewModel
 import com.gabbasov.meterscan.ui.Text
 import kotlinx.coroutines.flow.MutableStateFlow

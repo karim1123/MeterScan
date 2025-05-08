@@ -45,10 +45,11 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:feature-api"))
     implementation(project(":core:network"))
-    implementation(project(":core:model"))
+    implementation(project(":core:domain"))
     implementation(project(":feature:auth"))
     implementation(project(":feature:main"))
     implementation(project(":feature:meters"))
+    implementation(project(":feature:settings"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
