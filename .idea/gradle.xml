@@ -35,6 +35,7 @@
             <option value="$PROJECT_DIR$/feature/auth" />
             <option value="$PROJECT_DIR$/feature/main" />
             <option value="$PROJECT_DIR$/feature/meters" />
+            <option value="$PROJECT_DIR$/feature/scan" />
             <option value="$PROJECT_DIR$/feature/settings" />
           </set>
         </option>

@@ -50,6 +50,7 @@ dependencies {
     implementation(project(":feature:main"))
     implementation(project(":feature:meters"))
     implementation(project(":feature:settings"))
+    implementation(project(":feature:scan"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
