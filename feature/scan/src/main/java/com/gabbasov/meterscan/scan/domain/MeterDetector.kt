@@ -6,6 +6,7 @@ import android.os.SystemClock
 import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.InterpreterApi
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
 import org.tensorflow.lite.support.common.FileUtil
@@ -49,6 +50,8 @@ class MeterDetector(
         val options = Interpreter.Options().apply {
             val delegateOptions = compatList.bestOptionsForThisDevice
             this.addDelegate(GpuDelegate(delegateOptions))
+            this.setNumThreads(12) // Установка 4 потоков
+            this.setUseNNAPI(true) // Включение NNAPI
         }
 
         val model = FileUtil.loadMappedFile(context, modelPath)
