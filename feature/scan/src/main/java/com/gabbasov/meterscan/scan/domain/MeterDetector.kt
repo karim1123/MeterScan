@@ -47,12 +47,8 @@ class MeterDetector(
         val compatList = CompatibilityList()
 
         val options = Interpreter.Options().apply {
-            if (compatList.isDelegateSupportedOnThisDevice) {
-                val delegateOptions = compatList.bestOptionsForThisDevice
-                this.addDelegate(GpuDelegate(delegateOptions))
-            } else {
-                this.setNumThreads(4)
-            }
+            val delegateOptions = compatList.bestOptionsForThisDevice
+            this.addDelegate(GpuDelegate(delegateOptions))
         }
 
         val model = FileUtil.loadMappedFile(context, modelPath)
@@ -97,29 +93,6 @@ class MeterDetector(
             Log.e("test312", "Failed to load labels: ${e.message}", e)
             e.printStackTrace()
         }
-    }
-
-    fun restart(isGpu: Boolean) {
-        interpreter.close()
-
-        val options = if (isGpu) {
-            val compatList = CompatibilityList()
-            Interpreter.Options().apply {
-                if (compatList.isDelegateSupportedOnThisDevice) {
-                    val delegateOptions = compatList.bestOptionsForThisDevice
-                    this.addDelegate(GpuDelegate(delegateOptions))
-                } else {
-                    this.setNumThreads(4)
-                }
-            }
-        } else {
-            Interpreter.Options().apply {
-                this.setNumThreads(4)
-            }
-        }
-
-        val model = FileUtil.loadMappedFile(context, modelPath)
-        interpreter = Interpreter(model, options)
     }
 
     fun close() {
@@ -339,8 +312,8 @@ class MeterDetector(
         private const val INPUT_STANDARD_DEVIATION = 255f
         private val INPUT_IMAGE_TYPE = DataType.FLOAT32
         private val OUTPUT_IMAGE_TYPE = DataType.FLOAT32
-        private const val CONFIDENCE_THRESHOLD = 0.3F
-        private const val HIGH_CONFIDENCE_THRESHOLD = 0.8F
+        private const val CONFIDENCE_THRESHOLD = 0.5F
+        private const val HIGH_CONFIDENCE_THRESHOLD = 0.99F
         private const val IOU_THRESHOLD = 0.5F
         private const val Y_TOLERANCE_FACTOR = 0.5F  // Фактор допуска по Y
         private const val X_TOLERANCE_FACTOR = 2.0F  // Фактор допуска по X
