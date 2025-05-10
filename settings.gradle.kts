@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -21,4 +22,14 @@ dependencyResolutionManagement {
 
 rootProject.name = "MeterScan"
 include(":app")
- 
+include(":feature:auth")
+
+include(":core:designsystem")
+include(":core:network")
+include(":core:common")
+include(":core:domain")
+include(":core:feature-api")
+include(":feature:main")
+include(":feature:meters")
+include(":feature:settings")
+include(":feature:scan")
