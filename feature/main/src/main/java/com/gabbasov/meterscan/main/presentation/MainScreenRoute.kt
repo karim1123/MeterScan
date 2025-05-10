@@ -57,7 +57,7 @@ fun MainScreen(
                             restoreState = true
                         }
 
-                        MainTab.CAMERA -> bottomNavController.navigate(MainTab.CAMERA.name) {
+                        MainTab.CAMERA -> bottomNavController.navigate(MainTab.CAMERA.route) {
                             launchSingleTop = true
                             restoreState = true
                         }
@@ -115,9 +115,11 @@ fun MainTabsNavHost(
         navController = navController,
         startDestination = viewModel.metersFeatureApi.meterListRoute()
     ) {
-        composable(MainTab.CAMERA.name) {
-            CameraScreen(navController = navController)
-        }
+        register(
+            modifier = modifier,
+            navController = navController,
+            featureApi = viewModel.meterScanFeatureApi,
+        )
         composable(MainTab.WORK.name) {
             WorkScreen(navController = navController)
         }

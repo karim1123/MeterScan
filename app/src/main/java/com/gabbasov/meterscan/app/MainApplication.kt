@@ -7,6 +7,7 @@ import com.gabbasov.meterscan.di.coroutineDispatchersModule
 import com.gabbasov.meterscan.di.mainModule
 import com.gabbasov.meterscan.main.di.mainFeatureModule
 import com.gabbasov.meterscan.meters.di.metersFeatureModule
+import com.gabbasov.meterscan.scan.di.scanModule
 import com.gabbasov.meterscan.settings.di.settingsModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -29,6 +30,7 @@ class MainApplication : Application() {
                 mainFeatureModule,
                 metersFeatureModule,
                 settingsModule,
+                scanModule,
             )
         }
     }

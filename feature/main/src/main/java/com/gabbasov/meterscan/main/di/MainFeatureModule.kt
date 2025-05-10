@@ -10,5 +10,5 @@ import org.koin.dsl.module
 
 val mainFeatureModule = module {
     singleOf(::MainScreenNavigation) bind MainScreenFeatureApi::class
-    viewModel { MainViewModel(get(), get()) }
+    viewModel { MainViewModel(get(), get(), get()) }
 }
