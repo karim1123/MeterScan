@@ -29,7 +29,9 @@ class MeterDetector(
     private val context: Context,
     private val modelPath: String,
     private val labelPath: String,
-    private val detectorListener: DetectorListener
+    private val confidenceThreshold: Float,
+    private val highConfidenceThreshold: Float,
+    private val detectorListener: DetectorListener,
 ) {
     private var interpreter: Interpreter
     private var labels = mutableListOf<String>()
@@ -170,7 +172,7 @@ class MeterDetector(
         val digitBoxes = mutableListOf<DigitBox>()
 
         for (c in 0 until numElements) {
-            var maxConf = CONFIDENCE_THRESHOLD
+            var maxConf = confidenceThreshold
             var maxIdx = -1
             var j = 4
             var arrayIdx = c + numElements * j
@@ -184,7 +186,7 @@ class MeterDetector(
                 arrayIdx += numElements
             }
 
-            if (maxConf > CONFIDENCE_THRESHOLD) {
+            if (maxConf > confidenceThreshold) {
                 val digitValue = labels[maxIdx]
                 val cx = array[c] // центр X
                 val cy = array[c + numElements] // центр Y
@@ -272,7 +274,7 @@ class MeterDetector(
 
             if (distance in minValidDistance..maxValidDistance) {
                 result.add(currBox)
-            } else if (currBox.confidence > HIGH_CONFIDENCE_THRESHOLD) {
+            } else if (currBox.confidence > highConfidenceThreshold) {
                 // Если уверенность очень высокая, добавляем несмотря на расстояние
                 result.add(currBox)
             }
@@ -442,7 +444,7 @@ class MeterDetector(
                 result.add(currBox)
             } else {
                 // Проверяем уверенность распознавания
-                if (currBox.confidence > HIGH_CONFIDENCE_THRESHOLD) {
+                if (currBox.confidence > highConfidenceThreshold) {
                     result.add(currBox)
                 }
             }
@@ -478,8 +480,6 @@ class MeterDetector(
         private const val INPUT_STANDARD_DEVIATION = 255f
         private val INPUT_IMAGE_TYPE = DataType.FLOAT32
         private val OUTPUT_IMAGE_TYPE = DataType.FLOAT32
-        private const val CONFIDENCE_THRESHOLD = 0.5F
-        private const val HIGH_CONFIDENCE_THRESHOLD = 0.95F  // Порог высокой уверенности
         private const val IOU_THRESHOLD = 0.5F
         private const val Y_TOLERANCE_FACTOR = 0.5F  // Фактор допуска по Y
         private const val X_TOLERANCE_FACTOR = 2.0F  // Фактор допуска по X

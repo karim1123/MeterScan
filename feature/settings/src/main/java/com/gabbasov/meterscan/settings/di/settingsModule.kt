@@ -13,5 +13,5 @@ import org.koin.dsl.module
 val settingsModule = module {
     singleOf(::SettingsRepositoryImpl) bind SettingsRepository::class
     singleOf(::SettingsNavigation) bind SettingsFeatureApi::class
-    viewModel { SettingsViewModel(get(), get(), get()) }
+    viewModel { SettingsViewModel(get(), get(), get(), get()) }
 }

@@ -25,8 +25,10 @@ class CameraView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
+    private val confidenceThreshold: Float,
+    private val highConfidenceThreshold: Float,
     private val lifecycleOwner: LifecycleOwner,
-    private val onDigitsDetected: (List<DigitBox>) -> Unit
+    private val onDigitsDetected: (List<DigitBox>) -> Unit,
 ) : FrameLayout(context, attrs, defStyleAttr), MeterDetector.DetectorListener {
 
     companion object {
@@ -49,7 +51,16 @@ class CameraView @JvmOverloads constructor(
         // Создаем и инициализируем детектор
         cameraExecutor.execute {
             try {
-                detector = MeterDetector(context, MODEL_PATH, LABELS_PATH, this)
+                detector = MeterDetector(
+                    context = context,
+                    modelPath = MODEL_PATH,
+                    labelPath = LABELS_PATH,
+                    confidenceThreshold = confidenceThreshold,
+                    highConfidenceThreshold = highConfidenceThreshold,
+                    detectorListener = this,
+
+                )
+
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to initialize detector: ${e.message}")
             }

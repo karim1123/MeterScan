@@ -26,6 +26,18 @@ class SettingsCoordinator(
             popUpTo(0) { inclusive = true }
         }
     }
+
+    fun onBufferSizeChanged(size: Int) {
+        viewModel.execute(SettingsAction.SetBufferSize(size))
+    }
+
+    fun onConfidenceThresholdChanged(threshold: Float) {
+        viewModel.execute(SettingsAction.SetConfidenceThreshold(threshold))
+    }
+
+    fun onHighConfidenceThresholdChanged(threshold: Float) {
+        viewModel.execute(SettingsAction.SetHighConfidenceThreshold(threshold))
+    }
 }
 
 @Composable

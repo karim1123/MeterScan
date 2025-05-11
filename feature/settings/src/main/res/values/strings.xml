@@ -11,4 +11,11 @@
     <string name="yandex_maps">Яндекс.Карты</string>
     <string name="system_default">По умолчанию</string>
     <string name="app_version">Версия %s</string>
+    <string name="scan_parameters_title">Параметры распознавания</string>
+    <string name="buffer_size_label">Размер буфера: %1$d</string>
+    <string name="buffer_size_description">Больший размер дает более стабильное распознавание, но требует больше времени</string>
+    <string name="confidence_threshold_label">Порог уверенности: %1$.2f</string>
+    <string name="confidence_threshold_description">Минимальная уверенность для учета обнаруженных цифр</string>
+    <string name="high_confidence_threshold_label">Порог высокой уверенности: %1$.2f</string>
+    <string name="high_confidence_threshold_description">Цифры с уверенностью выше этого порога учитываются при любом расположении</string>
 </resources>

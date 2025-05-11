@@ -38,7 +38,9 @@ internal fun MeterScanScreenRoute(
             onRetryScanning = coordinator::onRetryScanning,
             onEnterManually = coordinator::onEnterManually,
             onDismissBottomSheet = coordinator::onDismissBottomSheet,
-            onDismissErrorDialog = coordinator::onDismissErrorDialog
+            onDismissErrorDialog = coordinator::onDismissErrorDialog,
+            confidenceThreshold = coordinator.getConfidenceThreshold(),
+            highConfidenceThreshold = coordinator.getHighConfidenceThreshold()
         )
     }
 }
@@ -53,7 +55,9 @@ internal fun MeterScanScreen(
     onRetryScanning: () -> Unit,
     onEnterManually: () -> Unit,
     onDismissBottomSheet: () -> Unit,
-    onDismissErrorDialog: () -> Unit
+    onDismissErrorDialog: () -> Unit,
+    confidenceThreshold: Float,
+    highConfidenceThreshold: Float,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -115,7 +119,9 @@ internal fun MeterScanScreen(
                         CameraView(
                             context = ctx,
                             lifecycleOwner = lifecycleOwner,
-                            onDigitsDetected = onDigitsDetected
+                            onDigitsDetected = onDigitsDetected,
+                            confidenceThreshold = confidenceThreshold,
+                            highConfidenceThreshold = highConfidenceThreshold
                         )
                     },
                     modifier = Modifier.fillMaxSize()

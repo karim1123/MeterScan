@@ -2,6 +2,8 @@ package com.gabbasov.meterscan.scan.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.gabbasov.meterscan.base.Resource
+import com.gabbasov.meterscan.repository.ScanSettingsRepository
+import com.gabbasov.meterscan.scan.data.ScanSettingsRepositoryImpl.Companion.STABILITY_THRESHOLD
 import com.gabbasov.meterscan.scan.domain.DigitBox
 import com.gabbasov.meterscan.ui.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,14 +11,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.math.abs
 
-private val recognitionBuffer = mutableListOf<List<DigitBox>>()
-private const val BUFFER_SIZE = 30     // Размер буфера накопления
-private const val MIN_STABLE_FRAMES = 20 // Минимальное количество стабильных кадров
-private const val STABILITY_THRESHOLD = 0.7f // Порог стабильности (70%)
-private const val MAX_NO_DETECTION_FRAMES = 20 // Макс. количество кадров без обнаружения
-
-class MeterScanViewModel : BaseViewModel() {
+class MeterScanViewModel(
+    private val scanSettingsRepository: ScanSettingsRepository
+) : BaseViewModel() {
     private val _uiState = MutableStateFlow(MeterScanState())
     val uiState = _uiState.asStateFlow()
 
@@ -29,6 +28,30 @@ class MeterScanViewModel : BaseViewModel() {
 
     // Счетчик пустых кадров для сброса буфера
     private var noDetectionCounter = 0
+
+    private val recognitionBuffer = mutableListOf<List<DigitBox>>()
+    private var bufferSize = 30 // Значение по умолчанию, обновится в init
+    private var confidenceThreshold = 0.5f
+    private var highConfidenceThreshold = 0.95f
+
+    private val maxNoDetectionFrames: Int
+        get() = (bufferSize / 3).coerceAtLeast(3)
+
+    private val minStableFrames: Int
+        get() = (bufferSize / 2).coerceAtLeast(5)
+
+    init {
+        // Загружаем настройки при инициализации
+        viewModelScope.launch {
+            bufferSize = scanSettingsRepository.getBufferSize()
+            confidenceThreshold = scanSettingsRepository.getConfidenceThreshold()
+            highConfidenceThreshold = scanSettingsRepository.getHighConfidenceThreshold()
+        }
+    }
+
+    fun getСonfidenceThreshold() = confidenceThreshold
+
+    fun getHighConfidenceThreshold() = highConfidenceThreshold
 
     fun execute(action: MeterScanAction) {
         logAction(action)
@@ -56,7 +79,7 @@ class MeterScanViewModel : BaseViewModel() {
             noDetectionCounter++
 
             // Если накопилось слишком много пустых кадров, сбрасываем буфер
-            if (noDetectionCounter >= MAX_NO_DETECTION_FRAMES) {
+            if (noDetectionCounter >= maxNoDetectionFrames) {
                 recognitionBuffer.clear()
                 noDetectionCounter = 0
                 state = state.copy(
@@ -72,15 +95,15 @@ class MeterScanViewModel : BaseViewModel() {
 
         // Добавляем в буфер новое обнаружение
         recognitionBuffer.add(validDigits)
-        if (recognitionBuffer.size > BUFFER_SIZE) {
+        if (recognitionBuffer.size > bufferSize) {
             recognitionBuffer.removeAt(0)
         }
 
         // Обновляем прогресс накопления
-        val progress = (recognitionBuffer.size.toFloat() / BUFFER_SIZE).coerceIn(0f, 1f)
+        val progress = (recognitionBuffer.size.toFloat() / bufferSize).coerceIn(0f, 1f)
 
         // Определяем консенсус только если буфер накопил достаточно данных
-        if (recognitionBuffer.size >= MIN_STABLE_FRAMES) {
+        if (recognitionBuffer.size >= minStableFrames) {
             val (consensusReading, consensusDigits, stabilityScore) = determineConsensusReading()
 
             state = state.copy(
@@ -120,7 +143,7 @@ class MeterScanViewModel : BaseViewModel() {
 
         // Все цифры должны находиться в пределах ±30% от средней высоты
         val areDigitsAligned = digitBoxes.all {
-            Math.abs(it.cy - avgY) < avgHeight * 0.3
+            abs(it.cy - avgY) < avgHeight * 0.3
         }
 
         // Проверяем, что цифры идут последовательно слева направо
@@ -171,31 +194,7 @@ class MeterScanViewModel : BaseViewModel() {
     }
 
     private fun saveReading(reading: String) = viewModelScope.launch {
-        state = state.copy(isLoading = true)
 
-        // Здесь должен быть вызов репозитория для сохранения показаний
-        // Например: val result = meterRepository.saveReading(reading)
-
-        // Имитация сохранения
-        val result = Resource.Success(Unit)
-
-        when (result) {
-            is Resource.Success -> {
-                state = state.copy(
-                    isLoading = false,
-                    showBottomSheet = false,
-                    showSuccessMessage = true
-                )
-            }
-            /*is Resource.Error -> {
-                state = state.copy(
-                    isLoading = false,
-                    error = com.gabbasov.meterscan.ui.Text.RawString(
-                        result.exception.message ?: "Ошибка сохранения показаний"
-                    )
-                )
-            }*/
-        }
     }
 
     private fun retryScanning() {
