@@ -18,11 +18,11 @@ fun MeterReadingBottomSheet(
     reading: String,
     onReadingChange: (String) -> Unit,
     onSave: () -> Unit,
-    onDismiss: () -> Unit,
+    onRetryScanning: () -> Unit,
     isLoading: Boolean
 ) {
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = onRetryScanning,
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
     ) {
         Column(
@@ -59,11 +59,11 @@ fun MeterReadingBottomSheet(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 OutlinedButton(
-                    onClick = onDismiss,
+                    onClick = onRetryScanning,
                     modifier = Modifier.weight(1f),
                     enabled = !isLoading
                 ) {
-                    Text(stringResource(R.string.cancel))
+                    Text(stringResource(R.string.try_again))
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))

@@ -34,6 +34,7 @@ import com.gabbasov.meterscan.designsystem.MeterScanTheme
 import com.gabbasov.meterscan.model.navigator.NavigatorType
 import com.gabbasov.meterscan.settings.R
 import com.gabbasov.meterscan.settings.presentation.components.NavigatorSelector
+import com.gabbasov.meterscan.settings.presentation.components.ScanParametersSettings
 import com.gabbasov.meterscan.settings.presentation.components.SettingsItem
 
 @Composable
@@ -47,7 +48,10 @@ internal fun SettingsScreenRoute(
             state = uiState,
             onCameraModeChanged = coordinator::onCameraModeChanged,
             onNavigatorTypeChanged = coordinator::onNavigatorTypeChanged,
-            onSignOutClicked = coordinator::onSignOutClicked
+            onSignOutClicked = coordinator::onSignOutClicked,
+            onBufferSizeChanged = coordinator::onBufferSizeChanged,
+            onConfidenceThresholdChanged = coordinator::onConfidenceThresholdChanged,
+            onHighConfidenceThresholdChanged = coordinator::onHighConfidenceThresholdChanged
         )
     }
 }
@@ -58,7 +62,10 @@ internal fun SettingsScreen(
     state: SettingsState,
     onCameraModeChanged: (Boolean) -> Unit,
     onNavigatorTypeChanged: (NavigatorType) -> Unit,
-    onSignOutClicked: () -> Unit
+    onSignOutClicked: () -> Unit,
+    onBufferSizeChanged: (Int) -> Unit,
+    onConfidenceThresholdChanged: (Float) -> Unit,
+    onHighConfidenceThresholdChanged: (Float) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -142,6 +149,23 @@ internal fun SettingsScreen(
                 }
             }
 
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            ScanParametersSettings(
+                bufferSize = state.bufferSize,
+                confidenceThreshold = state.confidenceThreshold,
+                highConfidenceThreshold = state.highConfidenceThreshold,
+                onBufferSizeChanged = { size ->
+                    onBufferSizeChanged(size)
+                },
+                onConfidenceThresholdChanged = { threshold ->
+                    onConfidenceThresholdChanged(threshold)
+                },
+                onHighConfidenceThresholdChanged = { threshold ->
+                    onHighConfidenceThresholdChanged(threshold)
+                }
+            )
+
             // Версия приложения
             Text(
                 text = stringResource(R.string.app_version, state.appVersion),
@@ -166,7 +190,10 @@ private fun SettingsScreenPreview() {
             ),
             onCameraModeChanged = {},
             onNavigatorTypeChanged = {},
-            onSignOutClicked = {}
+            onSignOutClicked = {},
+            onBufferSizeChanged = {},
+            onConfidenceThresholdChanged = {},
+            onHighConfidenceThresholdChanged = {},
         )
     }
 }

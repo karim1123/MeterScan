@@ -39,6 +39,10 @@ class MeterScanCoordinator(
     fun onDismissErrorDialog() {
         viewModel.execute(MeterScanAction.DismissErrorDialog)
     }
+
+    fun getConfidenceThreshold() = viewModel.getСonfidenceThreshold()
+
+    fun getHighConfidenceThreshold() = viewModel.getHighConfidenceThreshold()
 }
 
 @Composable

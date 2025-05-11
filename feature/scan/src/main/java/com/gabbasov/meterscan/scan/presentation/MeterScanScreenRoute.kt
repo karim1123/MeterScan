@@ -17,8 +17,8 @@ import com.gabbasov.meterscan.scan.R
 import com.gabbasov.meterscan.scan.domain.DigitBox
 import com.gabbasov.meterscan.scan.presentation.components.CameraView
 import com.gabbasov.meterscan.scan.presentation.components.DigitOverlayView
-import com.gabbasov.meterscan.scan.presentation.components.ErrorDialog
 import com.gabbasov.meterscan.scan.presentation.components.MeterReadingBottomSheet
+import com.gabbasov.meterscan.scan.presentation.components.RecognitionProgressIndicator
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -38,7 +38,9 @@ internal fun MeterScanScreenRoute(
             onRetryScanning = coordinator::onRetryScanning,
             onEnterManually = coordinator::onEnterManually,
             onDismissBottomSheet = coordinator::onDismissBottomSheet,
-            onDismissErrorDialog = coordinator::onDismissErrorDialog
+            onDismissErrorDialog = coordinator::onDismissErrorDialog,
+            confidenceThreshold = coordinator.getConfidenceThreshold(),
+            highConfidenceThreshold = coordinator.getHighConfidenceThreshold()
         )
     }
 }
@@ -53,7 +55,9 @@ internal fun MeterScanScreen(
     onRetryScanning: () -> Unit,
     onEnterManually: () -> Unit,
     onDismissBottomSheet: () -> Unit,
-    onDismissErrorDialog: () -> Unit
+    onDismissErrorDialog: () -> Unit,
+    confidenceThreshold: Float,
+    highConfidenceThreshold: Float,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -79,18 +83,9 @@ internal fun MeterScanScreen(
             reading = state.meterReading,
             onReadingChange = onReadingUpdated,
             onSave = { onSaveReading(state.meterReading) },
-            onDismiss = onDismissBottomSheet,
+            onRetryScanning = onRetryScanning,
             isLoading = state.isLoading
         )
-    }
-
-    // Диалог ошибки при неудачном распознавании
-    if (state.showErrorDialog) {
-        /*ErrorDialog(
-            onRetry = onRetryScanning,
-            onEnterManually = onEnterManually,
-            onDismiss = onDismissErrorDialog
-        )*/
     }
 
     // Показываем снекбар с успешным сохранением
@@ -124,7 +119,9 @@ internal fun MeterScanScreen(
                         CameraView(
                             context = ctx,
                             lifecycleOwner = lifecycleOwner,
-                            onDigitsDetected = onDigitsDetected
+                            onDigitsDetected = onDigitsDetected,
+                            confidenceThreshold = confidenceThreshold,
+                            highConfidenceThreshold = highConfidenceThreshold
                         )
                     },
                     modifier = Modifier.fillMaxSize()
@@ -136,16 +133,15 @@ internal fun MeterScanScreen(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Индикатор сканирования
+                // Индикатор распознавания и накопления результатов
                 if (state.isScanning) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(64.dp)
-                        )
-                    }
+                    RecognitionProgressIndicator(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .align(Alignment.TopCenter),
+                        progress = state.recognitionProgress,
+                        stabilityScore = state.stabilityScore
+                    )
                 }
             } else {
                 // Запрос разрешения на использование камеры

@@ -2,14 +2,20 @@ package com.gabbasov.meterscan.scan.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.gabbasov.meterscan.base.Resource
+import com.gabbasov.meterscan.repository.ScanSettingsRepository
+import com.gabbasov.meterscan.scan.data.ScanSettingsRepositoryImpl.Companion.STABILITY_THRESHOLD
 import com.gabbasov.meterscan.scan.domain.DigitBox
 import com.gabbasov.meterscan.ui.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import kotlin.math.abs
 
-class MeterScanViewModel : BaseViewModel() {
+class MeterScanViewModel(
+    private val scanSettingsRepository: ScanSettingsRepository
+) : BaseViewModel() {
     private val _uiState = MutableStateFlow(MeterScanState())
     val uiState = _uiState.asStateFlow()
 
@@ -18,6 +24,32 @@ class MeterScanViewModel : BaseViewModel() {
         set(value) {
             _uiState.update { value }
         }
+
+    private var noDetectionCounter = 0  // Счетчик пустых кадров для сброса буфера
+
+    private val recognitionBuffer = mutableListOf<List<DigitBox>>()
+    private var bufferSize = 30 // Значение по умолчанию, обновится в init
+    private var confidenceThreshold = 0.5f
+    private var highConfidenceThreshold = 0.95f
+
+    private val maxNoDetectionFrames: Int
+        get() = (bufferSize / 3).coerceAtLeast(3)
+
+    private val minStableFrames: Int
+        get() = (bufferSize / 2).coerceAtLeast(5)
+
+    init {
+        // Загружаем настройки при инициализации
+        viewModelScope.launch {
+            bufferSize = scanSettingsRepository.getBufferSize()
+            confidenceThreshold = scanSettingsRepository.getConfidenceThreshold()
+            highConfidenceThreshold = scanSettingsRepository.getHighConfidenceThreshold()
+        }
+    }
+
+    fun getСonfidenceThreshold() = confidenceThreshold
+
+    fun getHighConfidenceThreshold() = highConfidenceThreshold
 
     fun execute(action: MeterScanAction) {
         logAction(action)
@@ -33,64 +65,143 @@ class MeterScanViewModel : BaseViewModel() {
     }
 
     private fun processDetectedDigits(digitBoxes: List<DigitBox>) {
-        if (digitBoxes.isEmpty()) {
-            state = state.copy(
-                showErrorDialog = true,
-                isScanning = false
-            )
+        // Проверка валидности расположения цифр
+        val validDigits = if (isValidDigitArrangement(digitBoxes)) {
+            digitBoxes
+        } else emptyList()
+
+        // Обработка случая отсутствия обнаружений
+        if (validDigits.isEmpty()) {
+            noDetectionCounter++
+
+            // Если накопилось слишком много пустых кадров, сбрасываем буфер
+            if (noDetectionCounter >= maxNoDetectionFrames) {
+                recognitionBuffer.clear()
+                noDetectionCounter = 0
+                state = state.copy(
+                    recognitionProgress = 0f,
+                    stabilityScore = 0f
+                )
+            }
             return
         }
 
-        // Сортируем цифры по X-координате для получения правильного порядка
-        val sortedDigits = digitBoxes.sortedBy { it.cx }
+        // Сбрасываем счетчик пустых кадров при успешном обнаружении
+        noDetectionCounter = 0
 
-        // Формируем показания счетчика из распознанных цифр
-        val reading = sortedDigits.joinToString("") { it.digit }
+        // Добавляем в буфер новое обнаружение
+        recognitionBuffer.add(validDigits)
+        if (recognitionBuffer.size > bufferSize) {
+            recognitionBuffer.removeAt(0)
+        }
 
-        state = state.copy(
-            detectedDigits = sortedDigits,
-            meterReading = reading,
-            showBottomSheet = true,
-            isScanning = false
-        )
-    }
+        // Обновляем прогресс накопления
+        val progress = (recognitionBuffer.size.toFloat() / bufferSize).coerceIn(0f, 1f)
 
-    private fun updateMeterReading(reading: String) {
-        state = state.copy(
-            meterReading = reading
-        )
-    }
+        // Определяем консенсус только если буфер накопил достаточно данных
+        if (recognitionBuffer.size >= minStableFrames) {
+            val (consensusReading, consensusDigits, stabilityScore) = determineConsensusReading()
 
-    private fun saveReading(reading: String) = viewModelScope.launch {
-        state = state.copy(isLoading = true)
+            state = state.copy(
+                recognitionProgress = progress,
+                stabilityScore = stabilityScore
+            )
 
-        // Здесь должен быть вызов репозитория для сохранения показаний
-        // Например: val result = meterRepository.saveReading(reading)
-
-        // Имитация сохранения
-        val result = Resource.Success(Unit)
-
-        when (result) {
-            is Resource.Success -> {
+            // Если стабильность превысила порог - показываем результат
+            if (stabilityScore >= STABILITY_THRESHOLD && consensusDigits.isNotEmpty()) {
+                Timber.d("Стабильное распознавание: $consensusReading (score: $stabilityScore)")
                 state = state.copy(
-                    isLoading = false,
-                    showBottomSheet = false,
-                    showSuccessMessage = true
+                    detectedDigits = consensusDigits,
+                    meterReading = consensusReading,
+                    showBottomSheet = true,
+                    isScanning = false,
+                    recognitionProgress = 1.0f
                 )
+
+                // Очищаем буфер после успешного распознавания
+                recognitionBuffer.clear()
             }
-            /*is Resource.Error -> {
-                state = state.copy(
-                    isLoading = false,
-                    error = Text.RawString(result.exception.message ?: "Ошибка сохранения показаний")
-                )
-            }*/
+        } else {
+            // Если буфер еще накапливается, просто обновляем прогресс
+            state = state.copy(
+                recognitionProgress = progress,
+                stabilityScore = 0f
+            )
         }
     }
 
+    private fun isValidDigitArrangement(digitBoxes: List<DigitBox>): Boolean {
+        if (digitBoxes.size < 2) return true
+
+        // Проверяем, что цифры расположены примерно на одной линии
+        val avgY = digitBoxes.map { it.cy }.average()
+        val avgHeight = digitBoxes.map { it.h }.average()
+
+        // Все цифры должны находиться в пределах ±30% от средней высоты
+        val areDigitsAligned = digitBoxes.all {
+            abs(it.cy - avgY) < avgHeight * 0.3
+        }
+
+        // Проверяем, что цифры идут последовательно слева направо
+        val sortedDigits = digitBoxes.sortedBy { it.cx }
+        val avgWidth = sortedDigits.map { it.w }.average()
+        val isSequential = (0 until sortedDigits.size - 1).all { i ->
+            val currentX = sortedDigits[i].cx
+            val nextX = sortedDigits[i + 1].cx
+            val minDistance = avgWidth * 0.5 // Минимальное расстояние между цифрами
+            val maxDistance = avgWidth * 3.0 // Максимальное расстояние
+
+            (nextX - currentX) in minDistance..maxDistance
+        }
+
+        return areDigitsAligned && isSequential
+    }
+
+    private fun determineConsensusReading(): Triple<String, List<DigitBox>, Float> {
+        // Подсчитываем частоту появления каждой последовательности цифр
+        val readingFrequency = mutableMapOf<String, Int>()
+        val readingDigitBoxes = mutableMapOf<String, List<DigitBox>>()
+
+        for (detections in recognitionBuffer) {
+            if (detections.isEmpty()) continue
+
+            // Сортируем и формируем строку показаний
+            val sortedDigits = detections.sortedBy { it.cx }
+            val reading = sortedDigits.joinToString("") { it.digit }
+
+            readingFrequency[reading] = (readingFrequency[reading] ?: 0) + 1
+            readingDigitBoxes[reading] = sortedDigits
+        }
+
+        // Находим самое часто встречающееся показание
+        val mostFrequentEntry = readingFrequency.entries.maxByOrNull { it.value }
+
+        if (mostFrequentEntry != null) {
+            val (reading, frequency) = mostFrequentEntry
+            val stabilityScore = frequency.toFloat() / recognitionBuffer.size
+            return Triple(reading, readingDigitBoxes[reading] ?: emptyList(), stabilityScore)
+        }
+
+        return Triple("", emptyList(), 0f)
+    }
+
+    private fun updateMeterReading(reading: String) {
+        state = state.copy(meterReading = reading)
+    }
+
+    private fun saveReading(reading: String) = viewModelScope.launch {
+
+    }
+
     private fun retryScanning() {
+        recognitionBuffer.clear() // Сбрасываем буфер при повторном сканировании
+        noDetectionCounter = 0
+
         state = state.copy(
             isScanning = true,
-            showErrorDialog = false
+            showErrorDialog = false,
+            recognitionProgress = 0f,
+            stabilityScore = 0f
         )
     }
 
@@ -102,14 +213,10 @@ class MeterScanViewModel : BaseViewModel() {
     }
 
     private fun dismissBottomSheet() {
-        state = state.copy(
-            showBottomSheet = false
-        )
+        state = state.copy(showBottomSheet = false)
     }
 
     private fun dismissErrorDialog() {
-        state = state.copy(
-            showErrorDialog = false
-        )
+        state = state.copy(showErrorDialog = false)
     }
 }

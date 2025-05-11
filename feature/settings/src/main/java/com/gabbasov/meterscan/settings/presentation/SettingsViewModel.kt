@@ -5,6 +5,7 @@ import com.gabbasov.meterscan.base.Resource
 import com.gabbasov.meterscan.features.SignInFeatureApi
 import com.gabbasov.meterscan.model.navigator.NavigatorType
 import com.gabbasov.meterscan.repository.AuthRepository
+import com.gabbasov.meterscan.repository.ScanSettingsRepository
 import com.gabbasov.meterscan.repository.SettingsRepository
 import com.gabbasov.meterscan.ui.BaseViewModel
 import com.gabbasov.meterscan.ui.Text
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
+    private val scanSettingsRepository: ScanSettingsRepository,
     private val authRepository: AuthRepository,
     val signInApi: SignInFeatureApi,
     ) : BaseViewModel() {
@@ -30,6 +32,7 @@ class SettingsViewModel(
     init {
         loadUserData()
         loadSettings()
+        loadScanSettings()
     }
 
     fun execute(action: SettingsAction) {
@@ -38,6 +41,10 @@ class SettingsViewModel(
             is SettingsAction.SetCameraMode -> setCameraMode(action.enabled)
             is SettingsAction.SetNavigatorType -> setNavigatorType(action.type)
             is SettingsAction.SignOut -> signOut()
+            is SettingsAction.SetBufferSize -> setBufferSize(action.size)
+            is SettingsAction.SetConfidenceThreshold -> setConfidenceThreshold(action.threshold)
+            is SettingsAction.SetHighConfidenceThreshold -> setHighConfidenceThreshold(action.threshold)
+
         }
     }
 
@@ -101,6 +108,33 @@ class SettingsViewModel(
         } finally {
             state = state.copy(isLoading = false)
         }
+    }
+
+    private fun loadScanSettings() = viewModelScope.launch {
+        val bufferSize = scanSettingsRepository.getBufferSize()
+        val confidenceThreshold = scanSettingsRepository.getConfidenceThreshold()
+        val highConfidenceThreshold = scanSettingsRepository.getHighConfidenceThreshold()
+
+        state = state.copy(
+            bufferSize = bufferSize,
+            confidenceThreshold = confidenceThreshold,
+            highConfidenceThreshold = highConfidenceThreshold
+        )
+    }
+
+    private fun setBufferSize(size: Int) = viewModelScope.launch {
+        scanSettingsRepository.setBufferSize(size)
+        state = state.copy(bufferSize = size)
+    }
+
+    private fun setConfidenceThreshold(threshold: Float) = viewModelScope.launch {
+        scanSettingsRepository.setConfidenceThreshold(threshold)
+        state = state.copy(confidenceThreshold = threshold)
+    }
+
+    private fun setHighConfidenceThreshold(threshold: Float) = viewModelScope.launch {
+        scanSettingsRepository.setHighConfidenceThreshold(threshold)
+        state = state.copy(highConfidenceThreshold = threshold)
     }
 
     private fun handleError(errorMessage: String?) {
