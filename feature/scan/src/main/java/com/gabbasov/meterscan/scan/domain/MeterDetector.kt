@@ -50,7 +50,6 @@ class MeterDetector(
         val options = Interpreter.Options().apply {
             val delegateOptions = compatList.bestOptionsForThisDevice
             this.addDelegate(GpuDelegate(delegateOptions))
-            this.setNumThreads(12) // Установка 4 потоков
             this.setUseNNAPI(true) // Включение NNAPI
         }
 
@@ -315,7 +314,7 @@ class MeterDetector(
         private const val INPUT_STANDARD_DEVIATION = 255f
         private val INPUT_IMAGE_TYPE = DataType.FLOAT32
         private val OUTPUT_IMAGE_TYPE = DataType.FLOAT32
-        private const val CONFIDENCE_THRESHOLD = 0.5F
+        private const val CONFIDENCE_THRESHOLD = 0.6F //todo добавить настройку
         private const val HIGH_CONFIDENCE_THRESHOLD = 0.99F
         private const val IOU_THRESHOLD = 0.5F
         private const val Y_TOLERANCE_FACTOR = 0.5F  // Фактор допуска по Y

@@ -1,5 +1,6 @@
 package com.gabbasov.meterscan.scan.presentation.components
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.camera.core.Camera
@@ -10,6 +11,7 @@ import android.widget.FrameLayout
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
@@ -19,6 +21,7 @@ import com.gabbasov.meterscan.scan.domain.MeterDetector
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+@SuppressLint("ViewConstructor")
 class CameraView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -29,7 +32,7 @@ class CameraView @JvmOverloads constructor(
 
     companion object {
         private const val TAG = "CameraView"
-        private const val MODEL_PATH = "model_digits.tflite"
+        private const val MODEL_PATH = "best_float32.tflite"
         private const val LABELS_PATH = "digits_labels.txt"
     }
 
@@ -78,15 +81,13 @@ class CameraView @JvmOverloads constructor(
             .build()
 
         // Настройка превью камеры
-        val preview = androidx.camera.core.Preview.Builder()
-            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+        val preview = Preview.Builder()
             .setTargetRotation(rotation)
             .build()
 
         // Настройка анализатора изображений
         val imageAnalyzer = ImageAnalysis.Builder()
-            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_BLOCK_PRODUCER)
             .setTargetRotation(previewView.display.rotation)
             .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
@@ -95,7 +96,6 @@ class CameraView @JvmOverloads constructor(
         imageAnalyzer.setAnalyzer(cameraExecutor) { imageProxy ->
             if (!isProcessing && detector != null) {
                 isProcessing = true
-
                 val bitmapBuffer = Bitmap.createBitmap(
                     imageProxy.width,
                     imageProxy.height,
