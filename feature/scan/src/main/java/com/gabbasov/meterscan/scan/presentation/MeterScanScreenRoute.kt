@@ -83,7 +83,7 @@ internal fun MeterScanScreen(
             reading = state.meterReading,
             onReadingChange = onReadingUpdated,
             onSave = { onSaveReading(state.meterReading) },
-            onDismiss = onDismissBottomSheet,
+            onRetryScanning = onRetryScanning,
             isLoading = state.isLoading
         )
     }

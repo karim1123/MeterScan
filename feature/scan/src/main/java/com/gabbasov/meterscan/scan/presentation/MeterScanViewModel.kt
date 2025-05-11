@@ -25,9 +25,7 @@ class MeterScanViewModel(
             _uiState.update { value }
         }
 
-
-    // Счетчик пустых кадров для сброса буфера
-    private var noDetectionCounter = 0
+    private var noDetectionCounter = 0  // Счетчик пустых кадров для сброса буфера
 
     private val recognitionBuffer = mutableListOf<List<DigitBox>>()
     private var bufferSize = 30 // Значение по умолчанию, обновится в init
@@ -70,9 +68,7 @@ class MeterScanViewModel(
         // Проверка валидности расположения цифр
         val validDigits = if (isValidDigitArrangement(digitBoxes)) {
             digitBoxes
-        } else {
-            emptyList()
-        }
+        } else emptyList()
 
         // Обработка случая отсутствия обнаружений
         if (validDigits.isEmpty()) {
