@@ -17,8 +17,8 @@ import com.gabbasov.meterscan.scan.R
 import com.gabbasov.meterscan.scan.domain.DigitBox
 import com.gabbasov.meterscan.scan.presentation.components.CameraView
 import com.gabbasov.meterscan.scan.presentation.components.DigitOverlayView
-import com.gabbasov.meterscan.scan.presentation.components.ErrorDialog
 import com.gabbasov.meterscan.scan.presentation.components.MeterReadingBottomSheet
+import com.gabbasov.meterscan.scan.presentation.components.RecognitionProgressIndicator
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -84,15 +84,6 @@ internal fun MeterScanScreen(
         )
     }
 
-    // Диалог ошибки при неудачном распознавании
-    if (state.showErrorDialog) {
-        /*ErrorDialog(
-            onRetry = onRetryScanning,
-            onEnterManually = onEnterManually,
-            onDismiss = onDismissErrorDialog
-        )*/
-    }
-
     // Показываем снекбар с успешным сохранением
     val snackbarHostState = remember { SnackbarHostState() }
     if (state.showSuccessMessage) {
@@ -136,16 +127,15 @@ internal fun MeterScanScreen(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Индикатор сканирования
+                // Индикатор распознавания и накопления результатов
                 if (state.isScanning) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(64.dp)
-                        )
-                    }
+                    RecognitionProgressIndicator(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .align(Alignment.TopCenter),
+                        progress = state.recognitionProgress,
+                        stabilityScore = state.stabilityScore
+                    )
                 }
             } else {
                 // Запрос разрешения на использование камеры

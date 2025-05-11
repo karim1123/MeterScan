@@ -8,7 +8,6 @@ import android.graphics.Matrix
 import android.util.AttributeSet
 import android.util.Log
 import android.widget.FrameLayout
-import androidx.camera.core.AspectRatio
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -87,7 +86,7 @@ class CameraView @JvmOverloads constructor(
 
         // Настройка анализатора изображений
         val imageAnalyzer = ImageAnalysis.Builder()
-            .setBackpressureStrategy(ImageAnalysis.STRATEGY_BLOCK_PRODUCER)
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .setTargetRotation(previewView.display.rotation)
             .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
