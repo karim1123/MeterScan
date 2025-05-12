@@ -1,9 +1,22 @@
 package com.gabbasov.meterscan.scan.presentation.components
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,24 +24,33 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.gabbasov.meterscan.scan.R
+import com.skydoves.flexible.bottomsheet.material3.FlexibleBottomSheet
+import com.skydoves.flexible.core.FlexibleSheetSize
+import com.skydoves.flexible.core.rememberFlexibleBottomSheetState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MeterReadingBottomSheet(
     reading: String,
     onReadingChange: (String) -> Unit,
     onSave: () -> Unit,
     onRetryScanning: () -> Unit,
+    onDismissBottomSheet: () -> Unit,
     isLoading: Boolean
 ) {
-    ModalBottomSheet(
-        onDismissRequest = onRetryScanning,
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+    FlexibleBottomSheet(
+        sheetState = rememberFlexibleBottomSheetState(
+            flexibleSheetSize = FlexibleSheetSize(
+                fullyExpanded = 0.6f,
+                intermediatelyExpanded = 0.33f,
+                slightlyExpanded = 0.2f
+            )
+        ),
+        onDismissRequest = onDismissBottomSheet,
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .wrapContentSize()
+                .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -84,9 +106,6 @@ fun MeterReadingBottomSheet(
                     }
                 }
             }
-
-            // Добавляем отступ снизу для лучшего UX на устройствах с жестовой навигацией
-            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

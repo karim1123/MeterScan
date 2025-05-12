@@ -77,17 +77,6 @@ internal fun MeterScanScreen(
         }
     }
 
-    // Окно подтверждения для показаний счетчика
-    if (state.showBottomSheet) {
-        MeterReadingBottomSheet(
-            reading = state.meterReading,
-            onReadingChange = onReadingUpdated,
-            onSave = { onSaveReading(state.meterReading) },
-            onRetryScanning = onRetryScanning,
-            isLoading = state.isLoading
-        )
-    }
-
     // Показываем снекбар с успешным сохранением
     val snackbarHostState = remember { SnackbarHostState() }
     if (state.showSuccessMessage) {
@@ -112,6 +101,19 @@ internal fun MeterScanScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+
+            // Окно подтверждения для показаний счетчика
+            if (state.showBottomSheet) {
+                MeterReadingBottomSheet(
+                    reading = state.meterReading,
+                    onReadingChange = onReadingUpdated,
+                    onSave = { onSaveReading(state.meterReading) },
+                    onRetryScanning = onRetryScanning,
+                    onDismissBottomSheet = onDismissBottomSheet,
+                    isLoading = state.isLoading
+                )
+            }
+
             if (cameraPermissionState.status.isGranted) {
                 // Отображаем превью камеры
                 AndroidView(
