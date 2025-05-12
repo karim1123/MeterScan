@@ -1,7 +1,6 @@
 package com.gabbasov.meterscan.scan.presentation
 
 import androidx.lifecycle.viewModelScope
-import com.gabbasov.meterscan.base.Resource
 import com.gabbasov.meterscan.repository.ScanSettingsRepository
 import com.gabbasov.meterscan.scan.data.ScanSettingsRepositoryImpl.Companion.STABILITY_THRESHOLD
 import com.gabbasov.meterscan.scan.domain.DigitBox
@@ -61,7 +60,12 @@ class MeterScanViewModel(
             is MeterScanAction.EnterManually -> showEditDialog()
             is MeterScanAction.DismissBottomSheet -> dismissBottomSheet()
             is MeterScanAction.DismissErrorDialog -> dismissErrorDialog()
+            is MeterScanAction.ToggleFlashlight -> toggleCamera()
         }
+    }
+
+    private fun toggleCamera() {
+        state = state.copy(flashlightEnabled = !state.flashlightEnabled)
     }
 
     private fun processDetectedDigits(digitBoxes: List<DigitBox>) {

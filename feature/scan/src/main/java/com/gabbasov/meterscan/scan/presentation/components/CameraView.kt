@@ -20,6 +20,11 @@ import com.gabbasov.meterscan.scan.domain.MeterDetector
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+interface FlashlightControl {
+    fun toggleFlashlight(): Boolean
+    val isFlashlightOn: Boolean
+}
+
 @SuppressLint("ViewConstructor")
 class CameraView @JvmOverloads constructor(
     context: Context,
@@ -29,13 +34,15 @@ class CameraView @JvmOverloads constructor(
     private val highConfidenceThreshold: Float,
     private val lifecycleOwner: LifecycleOwner,
     private val onDigitsDetected: (List<DigitBox>) -> Unit,
-) : FrameLayout(context, attrs, defStyleAttr), MeterDetector.DetectorListener {
+) : FrameLayout(context, attrs, defStyleAttr), MeterDetector.DetectorListener, FlashlightControl {
 
     companion object {
         private const val TAG = "CameraView"
         private const val MODEL_PATH = "best_float32.tflite"
         private const val LABELS_PATH = "digits_labels.txt"
     }
+
+    private var isFlashlightEnabled = false
 
     private val previewView: PreviewView = PreviewView(context)
     private var camera: Camera? = null
@@ -68,6 +75,22 @@ class CameraView @JvmOverloads constructor(
 
         // Запускаем камеру
         startCamera()
+    }
+
+    override val isFlashlightOn: Boolean
+        get() = isFlashlightEnabled
+
+    override fun toggleFlashlight(): Boolean {
+        camera?.let {
+            try {
+                isFlashlightEnabled = !isFlashlightEnabled
+                it.cameraControl.enableTorch(isFlashlightEnabled)
+                return isFlashlightEnabled
+            } catch (e: Exception) {
+                Log.e(TAG, "Flashlight error: ${e.message}")
+            }
+        }
+        return false
     }
 
     private fun startCamera() {

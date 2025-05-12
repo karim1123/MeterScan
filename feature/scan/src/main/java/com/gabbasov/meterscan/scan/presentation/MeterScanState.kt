@@ -13,8 +13,9 @@ data class MeterScanState(
     val showErrorDialog: Boolean = false,
     val showSuccessMessage: Boolean = false,
     val isScanning: Boolean = true,
-    val recognitionProgress: Float = 0f,  // Прогресс накопления (0.0-1.0)
-    val stabilityScore: Float = 0f,       // Оценка стабильности показаний (0.0-1.0)
+    val recognitionProgress: Float = 0f,
+    val stabilityScore: Float = 0f,
+    val flashlightEnabled: Boolean = false,
     override val isLoading: Boolean = false,
     override val error: com.gabbasov.meterscan.ui.Text? = null
 ) : BaseState()
@@ -27,4 +28,5 @@ sealed interface MeterScanAction : BaseAction {
     data object EnterManually : MeterScanAction
     data object DismissBottomSheet : MeterScanAction
     data object DismissErrorDialog : MeterScanAction
+    data object ToggleFlashlight  : MeterScanAction
 }

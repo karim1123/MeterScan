@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="scan_meter_reading">Сканирование показаний</string>
+    <string name="scan_meter_reading">Сканирование</string>
     <string name="meter_reading">Показания счетчика</string>
     <string name="camera_permission_required">Для сканирования показаний необходим доступ к камере</string>
     <string name="grant_permission">Предоставить доступ</string>
@@ -12,4 +12,6 @@
     <string name="recognition_failed">Ошибка распознавания</string>
     <string name="could_not_recognize_meter">Не удалось распознать показания счетчика. Попробуйте снова или введите показания вручную.</string>
     <string name="meter_reading_saved">Показания успешно сохранены</string>
+    <string name="turn_off_flashlight">Выключить фонарик</string>
+    <string name="turn_on_flashlight">Включить фонарик</string>
 </resources>
