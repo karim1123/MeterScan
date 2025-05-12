@@ -9,9 +9,6 @@ import android.util.AttributeSet
 import android.view.View
 import com.gabbasov.meterscan.scan.domain.DigitBox
 
-/**
- * Отображение распознанных цифр поверх видео с камеры
- */
 class DigitOverlayView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -19,6 +16,7 @@ class DigitOverlayView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private var digitBoxes = listOf<DigitBox>()
+    private var currentRotation = 0
     private var boxPaint = Paint()
     private var textBackgroundPaint = Paint()
     private var textPaint = Paint()
@@ -30,6 +28,13 @@ class DigitOverlayView @JvmOverloads constructor(
 
     fun clear() {
         digitBoxes = listOf()
+        currentRotation = 0
+        invalidate()
+    }
+
+    fun setResults(boxes: List<DigitBox>, rotation: Int = 0) {
+        digitBoxes = boxes
+        currentRotation = rotation
         invalidate()
     }
 
@@ -55,6 +60,14 @@ class DigitOverlayView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
+        // Сохраняем состояние canvas
+        canvas.save()
+
+        // Применяем ротацию к canvas
+        val centerX = width / 2f
+        val centerY = height / 2f
+        canvas.rotate(currentRotation.toFloat(), centerX, centerY)
 
         // Сортируем цифры по x-координате для правильного отображения
         val sortedBoxes = digitBoxes.sortedBy { it.x1 }
@@ -87,11 +100,9 @@ class DigitOverlayView @JvmOverloads constructor(
             // Текст с цифрой
             canvas.drawText(drawableText, left, top + bounds.height(), textPaint)
         }
-    }
 
-    fun setResults(boxes: List<DigitBox>) {
-        digitBoxes = boxes
-        invalidate()
+        // Восстанавливаем состояние canvas
+        canvas.restore()
     }
 
     companion object {

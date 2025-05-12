@@ -88,9 +88,9 @@ internal fun MeterScanScreen(
     val cameraPermissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
     val overlayView = remember { DigitOverlayView(context) }
 
-    LaunchedEffect(state.detectedDigits) {
+    LaunchedEffect(state.detectedDigits, state.cameraRotation) {
         if (state.detectedDigits.isNotEmpty()) {
-            overlayView.setResults(state.detectedDigits)
+            overlayView.setResults(state.detectedDigits, state.cameraRotation)
         } else {
             overlayView.clear()
         }
