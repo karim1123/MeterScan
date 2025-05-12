@@ -15,4 +15,6 @@
     <string name="turn_off_flashlight">Выключить фонарик</string>
     <string name="turn_on_flashlight">Включить фонарик</string>
     <string name="rotate_camera">Повернуть камеру</string>
+    <string name="pause_scanning">Приостановить сканирование</string>
+    <string name="resume_scanning">Возобновить сканирование</string>
 </resources>

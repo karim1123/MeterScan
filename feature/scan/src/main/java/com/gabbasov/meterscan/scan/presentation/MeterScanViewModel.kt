@@ -62,7 +62,12 @@ class MeterScanViewModel(
             is MeterScanAction.DismissErrorDialog -> dismissErrorDialog()
             is MeterScanAction.ToggleFlashlight -> toggleCamera()
             is MeterScanAction.RotateCamera -> rotateCamera()
+            is MeterScanAction.TogglePause -> togglePause()
         }
+    }
+
+    private fun togglePause() {
+        state = state.copy(isPaused = !state.isPaused)
     }
 
     private fun toggleCamera() {

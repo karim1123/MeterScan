@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -64,7 +67,8 @@ internal fun MeterScanScreenRoute(
             confidenceThreshold = coordinator.getConfidenceThreshold(),
             highConfidenceThreshold = coordinator.getHighConfidenceThreshold(),
             onToggleFlashlight = coordinator::onToggleFlashlight,
-            onRotateCamera = coordinator::onRotateCamera
+            onRotateCamera = coordinator::onRotateCamera,
+            onTogglePause = coordinator::onTogglePause,
         )
     }
 }
@@ -82,6 +86,7 @@ internal fun MeterScanScreen(
     highConfidenceThreshold: Float,
     onToggleFlashlight: () -> Unit,
     onRotateCamera: () -> Unit,
+    onTogglePause: () -> Unit,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -115,6 +120,19 @@ internal fun MeterScanScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.scan_meter_reading)) },
                 actions = {
+                    IconButton(onClick = onTogglePause) {
+                        val imageRes = if (state.isPaused) R.drawable.ic_play else R.drawable.ic_pause
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = imageRes),
+                            contentDescription = stringResource(
+                                if (state.isPaused)
+                                    R.string.resume_scanning
+                                else
+                                    R.string.pause_scanning
+                            )
+                        )
+                    }
+
                     // Кнопка поворота
                     IconButton(onClick = onRotateCamera) {
                         Icon(
@@ -169,7 +187,8 @@ internal fun MeterScanScreen(
                             onDigitsDetected = onDigitsDetected,
                             confidenceThreshold = confidenceThreshold,
                             highConfidenceThreshold = highConfidenceThreshold,
-                            rotation = state.cameraRotation
+                            rotation = state.cameraRotation,
+                            isPaused = state.isPaused
                         )
                         flashlightControl.value = view
                         cameraView = view
@@ -177,16 +196,19 @@ internal fun MeterScanScreen(
                     },
                     modifier = Modifier.fillMaxSize(),
                     update = { view ->
+                        view.setPaused(state.isPaused)
                         if (view.rotation != state.cameraRotation) {
                             view.rotation = state.cameraRotation
                         }
                     }
                 )
 
-                AndroidView(
-                    factory = { overlayView },
-                    modifier = Modifier.fillMaxSize()
-                )
+                if (!state.isPaused) {
+                    AndroidView(
+                        factory = { overlayView },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
 
                 if (state.isScanning) {
                     RecognitionProgressIndicator(

@@ -36,6 +36,7 @@ class CameraView @JvmOverloads constructor(
     private val lifecycleOwner: LifecycleOwner,
     private val onDigitsDetected: (List<DigitBox>) -> Unit,
     rotation: Int = 0,
+    private var isPaused: Boolean = false,
 ) : FrameLayout(context, attrs, defStyleAttr), MeterDetector.DetectorListener, FlashlightControl {
 
     companion object {
@@ -106,6 +107,10 @@ class CameraView @JvmOverloads constructor(
         return false
     }
 
+    fun setPaused(paused: Boolean) {
+        isPaused = paused
+    }
+
     private fun applyRotationTransform() {
         if (previewView.width == 0 || previewView.height == 0) return
 
@@ -169,7 +174,7 @@ class CameraView @JvmOverloads constructor(
 
         // Устанавливаем анализатор для обработки кадров
         imageAnalyzer.setAnalyzer(cameraExecutor) { imageProxy ->
-            if (!isProcessing && detector != null) {
+            if (!isProcessing && detector != null && !isPaused) {
                 isProcessing = true
                 val bitmapBuffer = Bitmap.createBitmap(
                     imageProxy.width,

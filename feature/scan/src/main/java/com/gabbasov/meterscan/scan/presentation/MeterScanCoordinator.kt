@@ -51,6 +51,10 @@ class MeterScanCoordinator(
     fun onRotateCamera() {
         viewModel.execute(MeterScanAction.RotateCamera)
     }
+
+    fun onTogglePause() {
+        viewModel.execute(MeterScanAction.TogglePause)
+    }
 }
 
 @Composable
