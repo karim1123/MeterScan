@@ -47,6 +47,10 @@ class MeterScanCoordinator(
     fun onToggleFlashlight() {
         viewModel.execute(MeterScanAction.ToggleFlashlight)
     }
+
+    fun onRotateCamera() {
+        viewModel.execute(MeterScanAction.RotateCamera)
+    }
 }
 
 @Composable

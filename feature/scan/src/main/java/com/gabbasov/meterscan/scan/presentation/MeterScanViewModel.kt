@@ -61,11 +61,18 @@ class MeterScanViewModel(
             is MeterScanAction.DismissBottomSheet -> dismissBottomSheet()
             is MeterScanAction.DismissErrorDialog -> dismissErrorDialog()
             is MeterScanAction.ToggleFlashlight -> toggleCamera()
+            is MeterScanAction.RotateCamera -> rotateCamera()
         }
     }
 
     private fun toggleCamera() {
         state = state.copy(flashlightEnabled = !state.flashlightEnabled)
+    }
+
+    private fun rotateCamera() {
+        val currentRotation = state.cameraRotation
+        val nextRotation = (currentRotation + 90) % 360
+        state = state.copy(cameraRotation = nextRotation)
     }
 
     private fun processDetectedDigits(digitBoxes: List<DigitBox>) {

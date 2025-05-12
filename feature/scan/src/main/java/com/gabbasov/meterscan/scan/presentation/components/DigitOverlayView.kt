@@ -47,7 +47,7 @@ class DigitOverlayView @JvmOverloads constructor(
         }
 
         boxPaint.apply {
-            color = Color.GREEN//ContextCompat.getColor(context, R.color.digitBoxColor)
+            color = Color.GREEN
             strokeWidth = 8F
             style = Paint.Style.STROKE
         }

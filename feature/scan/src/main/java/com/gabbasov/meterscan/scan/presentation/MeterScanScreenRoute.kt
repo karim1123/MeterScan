@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -66,7 +63,8 @@ internal fun MeterScanScreenRoute(
             onDismissBottomSheet = coordinator::onDismissBottomSheet,
             confidenceThreshold = coordinator.getConfidenceThreshold(),
             highConfidenceThreshold = coordinator.getHighConfidenceThreshold(),
-            onToggleFlashlight = coordinator::onToggleFlashlight
+            onToggleFlashlight = coordinator::onToggleFlashlight,
+            onRotateCamera = coordinator::onRotateCamera
         )
     }
 }
@@ -83,17 +81,13 @@ internal fun MeterScanScreen(
     confidenceThreshold: Float,
     highConfidenceThreshold: Float,
     onToggleFlashlight: () -> Unit,
+    onRotateCamera: () -> Unit,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-
-    // Запрос разрешения на камеру
     val cameraPermissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
-
-    // Создаем и запоминаем DigitOverlayView для наложения поверх камеры
     val overlayView = remember { DigitOverlayView(context) }
 
-    // Отображаем текущие обнаруженные цифры
     LaunchedEffect(state.detectedDigits) {
         if (state.detectedDigits.isNotEmpty()) {
             overlayView.setResults(state.detectedDigits)
@@ -102,7 +96,6 @@ internal fun MeterScanScreen(
         }
     }
 
-    // Показываем снекбар с успешным сохранением
     val snackbarHostState = remember { SnackbarHostState() }
     if (state.showSuccessMessage) {
         LaunchedEffect(Unit) {
@@ -114,15 +107,23 @@ internal fun MeterScanScreen(
     }
 
     var isFlashlightOn by remember { mutableStateOf(false) }
-
-    // Reference to control the flashlight
     val flashlightControl = remember { mutableStateOf<FlashlightControl?>(null) }
+    var cameraView by remember { mutableStateOf<CameraView?>(null) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.scan_meter_reading)) },
                 actions = {
+                    // Кнопка поворота
+                    IconButton(onClick = onRotateCamera) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_rotate),
+                            contentDescription = stringResource(R.string.rotate_camera)
+                        )
+                    }
+
+                    // Кнопка фонарика
                     IconButton(
                         onClick = {
                             flashlightControl.value?.let {
@@ -148,8 +149,6 @@ internal fun MeterScanScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-
-            // Окно подтверждения для показаний счетчика
             if (state.showBottomSheet) {
                 MeterReadingBottomSheet(
                     reading = state.meterReading,
@@ -162,7 +161,6 @@ internal fun MeterScanScreen(
             }
 
             if (cameraPermissionState.status.isGranted) {
-                // Отображаем превью камеры
                 AndroidView(
                     factory = { ctx ->
                         val view = CameraView(
@@ -170,21 +168,26 @@ internal fun MeterScanScreen(
                             lifecycleOwner = lifecycleOwner,
                             onDigitsDetected = onDigitsDetected,
                             confidenceThreshold = confidenceThreshold,
-                            highConfidenceThreshold = highConfidenceThreshold
+                            highConfidenceThreshold = highConfidenceThreshold,
+                            rotation = state.cameraRotation
                         )
                         flashlightControl.value = view
+                        cameraView = view
                         view
                     },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    update = { view ->
+                        if (view.rotation != state.cameraRotation) {
+                            view.rotation = state.cameraRotation
+                        }
+                    }
                 )
 
-                // Накладываем слой с обнаруженными цифрами
                 AndroidView(
                     factory = { overlayView },
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Индикатор распознавания и накопления результатов
                 if (state.isScanning) {
                     RecognitionProgressIndicator(
                         modifier = Modifier
@@ -195,7 +198,6 @@ internal fun MeterScanScreen(
                     )
                 }
             } else {
-                // Запрос разрешения на использование камеры
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
