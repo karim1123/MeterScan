@@ -43,6 +43,18 @@ class MeterScanCoordinator(
     fun getConfidenceThreshold() = viewModel.getСonfidenceThreshold()
 
     fun getHighConfidenceThreshold() = viewModel.getHighConfidenceThreshold()
+
+    fun onToggleFlashlight() {
+        viewModel.execute(MeterScanAction.ToggleFlashlight)
+    }
+
+    fun onRotateCamera() {
+        viewModel.execute(MeterScanAction.RotateCamera)
+    }
+
+    fun onTogglePause() {
+        viewModel.execute(MeterScanAction.TogglePause)
+    }
 }
 
 @Composable

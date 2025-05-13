@@ -64,9 +64,12 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
     implementation(libs.koin.compose)
+    implementation(libs.kotlinx.collections.immutable)
     implementation(libs.koin.core)
 
     implementation(libs.androidx.material)
+
+    implementation(libs.flexible.bottomsheet.material3)
 
     // Room dependencies
     implementation(libs.androidx.room.runtime)

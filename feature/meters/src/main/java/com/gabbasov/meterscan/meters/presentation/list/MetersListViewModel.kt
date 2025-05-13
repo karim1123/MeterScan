@@ -5,6 +5,7 @@ import com.gabbasov.meterscan.repository.MetersRepository
 import com.gabbasov.meterscan.base.Resource
 import com.gabbasov.meterscan.ui.BaseViewModel
 import com.gabbasov.meterscan.ui.Text
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -43,7 +44,7 @@ internal class MetersListViewModel(
                 is Resource.Success -> {
                     state.copy(
                         isLoading = false,
-                        meters = result.data,
+                        meters = result.data.toImmutableList(),
                         error = null
                     )
                 }

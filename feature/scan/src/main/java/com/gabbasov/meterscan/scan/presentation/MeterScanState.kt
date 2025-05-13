@@ -4,17 +4,23 @@ import androidx.compose.runtime.Stable
 import com.gabbasov.meterscan.domain.BaseAction
 import com.gabbasov.meterscan.domain.BaseState
 import com.gabbasov.meterscan.scan.domain.DigitBox
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Stable
 data class MeterScanState(
-    val detectedDigits: List<DigitBox> = emptyList(),
+    val detectedDigits: ImmutableList<DigitBox> = persistentListOf(),
     val meterReading: String = "",
+    val defaultPickerCount: Int = 4,
     val showBottomSheet: Boolean = false,
     val showErrorDialog: Boolean = false,
     val showSuccessMessage: Boolean = false,
     val isScanning: Boolean = true,
-    val recognitionProgress: Float = 0f,  // Прогресс накопления (0.0-1.0)
-    val stabilityScore: Float = 0f,       // Оценка стабильности показаний (0.0-1.0)
+    val recognitionProgress: Float = 0f,
+    val stabilityScore: Float = 0f,
+    val flashlightEnabled: Boolean = false,
+    val cameraRotation: Int = 0, // 0, 90, 180, 270
+    val isPaused: Boolean = false,
     override val isLoading: Boolean = false,
     override val error: com.gabbasov.meterscan.ui.Text? = null
 ) : BaseState()
@@ -27,4 +33,7 @@ sealed interface MeterScanAction : BaseAction {
     data object EnterManually : MeterScanAction
     data object DismissBottomSheet : MeterScanAction
     data object DismissErrorDialog : MeterScanAction
+    data object ToggleFlashlight  : MeterScanAction
+    data object RotateCamera : MeterScanAction
+    data object TogglePause : MeterScanAction
 }
