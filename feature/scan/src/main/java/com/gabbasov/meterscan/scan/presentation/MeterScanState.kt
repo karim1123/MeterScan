@@ -4,11 +4,14 @@ import androidx.compose.runtime.Stable
 import com.gabbasov.meterscan.domain.BaseAction
 import com.gabbasov.meterscan.domain.BaseState
 import com.gabbasov.meterscan.scan.domain.DigitBox
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Stable
 data class MeterScanState(
-    val detectedDigits: List<DigitBox> = emptyList(),
+    val detectedDigits: ImmutableList<DigitBox> = persistentListOf(),
     val meterReading: String = "",
+    val defaultPickerCount: Int = 4,
     val showBottomSheet: Boolean = false,
     val showErrorDialog: Boolean = false,
     val showSuccessMessage: Boolean = false,

@@ -23,4 +23,8 @@ interface ScanSettingsRepository {
      */
     suspend fun getHighConfidenceThreshold(): Float
     suspend fun setHighConfidenceThreshold(threshold: Float)
+
+    // Количество цифр в счетчике
+    suspend fun getDefaultDigitCount(): Int
+    suspend fun setDefaultDigitCount(count: Int)
 }

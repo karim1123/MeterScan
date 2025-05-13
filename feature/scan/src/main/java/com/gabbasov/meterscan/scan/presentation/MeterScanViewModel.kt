@@ -5,6 +5,7 @@ import com.gabbasov.meterscan.repository.ScanSettingsRepository
 import com.gabbasov.meterscan.scan.data.ScanSettingsRepositoryImpl.Companion.STABILITY_THRESHOLD
 import com.gabbasov.meterscan.scan.domain.DigitBox
 import com.gabbasov.meterscan.ui.BaseViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -117,6 +118,7 @@ class MeterScanViewModel(
         // Определяем консенсус только если буфер накопил достаточно данных
         if (recognitionBuffer.size >= minStableFrames) {
             val (consensusReading, consensusDigits, stabilityScore) = determineConsensusReading()
+            val trimmedReading = consensusReading.trimStart('0').ifEmpty { "0" }
 
             state = state.copy(
                 recognitionProgress = progress,
@@ -127,8 +129,8 @@ class MeterScanViewModel(
             if (stabilityScore >= STABILITY_THRESHOLD && consensusDigits.isNotEmpty()) {
                 Timber.d("Стабильное распознавание: $consensusReading (score: $stabilityScore)")
                 state = state.copy(
-                    detectedDigits = consensusDigits,
-                    meterReading = consensusReading,
+                    detectedDigits = consensusDigits.toImmutableList(),
+                    meterReading = trimmedReading,
                     showBottomSheet = true,
                     isScanning = false,
                     recognitionProgress = 1.0f
@@ -202,7 +204,9 @@ class MeterScanViewModel(
     }
 
     private fun updateMeterReading(reading: String) {
-        state = state.copy(meterReading = reading)
+        // Удаляем ведущие нули, но оставляем хотя бы один ноль если строка состоит только из нулей
+        val trimmedReading = reading.trimStart('0').ifEmpty { "0" }
+        state = state.copy(meterReading = trimmedReading)
     }
 
     private fun saveReading(reading: String) = viewModelScope.launch {

@@ -7,6 +7,7 @@ firebaseBom = "33.12.0"
 flexibleBottomsheetMaterial3 = "0.1.5"
 kotlin = "2.1.0"
 coreKtx = "1.15.0"
+kotlinxCollectionsImmutable = "0.3.7"
 kotlinxCoroutinesCore = "1.7.3"
 ksp = "2.1.0-1.0.29"
 junit = "4.13.2"
@@ -62,6 +63,7 @@ koin-android = { module = "io.insert-koin:koin-android" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose" }
 koin-compose = { module = "io.insert-koin:koin-compose" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
