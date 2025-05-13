@@ -1,7 +1,6 @@
 package com.gabbasov.meterscan.scan.presentation
 
 import android.Manifest
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,9 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -171,12 +167,12 @@ internal fun MeterScanScreen(
             if (state.showBottomSheet) {
                 MeterReadingBottomSheet(
                     reading = state.meterReading,
+                    isScanning = !state.isPaused,
                     onReadingChange = onReadingUpdated,
                     onSave = { onSaveReading(state.meterReading) },
                     onRetryScanning = onRetryScanning,
                     onDismissBottomSheet = onDismissBottomSheet,
-                    isLoading = state.isLoading,
-                    defaultDigitCount = state.defaultPickerCount
+                    defaultDigitCount = state.meterReading.length
                 )
             }
 

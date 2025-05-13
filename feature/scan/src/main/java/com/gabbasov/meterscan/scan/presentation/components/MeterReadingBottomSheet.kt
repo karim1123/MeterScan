@@ -8,13 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -23,9 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,26 +38,37 @@ import com.gabbasov.meterscan.scan.presentation.components.picker.integerOnlyReg
 import com.skydoves.flexible.bottomsheet.material3.FlexibleBottomSheet
 import com.skydoves.flexible.core.FlexibleSheetSize
 import com.skydoves.flexible.core.rememberFlexibleBottomSheetState
+import kotlinx.coroutines.launch
 
 @Composable
 fun MeterReadingBottomSheet(
     reading: String,
+    isScanning: Boolean,
     onReadingChange: (String) -> Unit,
     onSave: () -> Unit,
     onRetryScanning: () -> Unit,
     onDismissBottomSheet: () -> Unit,
-    isLoading: Boolean,
-    defaultDigitCount: Int = 4
+    defaultDigitCount: Int
 ) {
-    var digitCount by remember { mutableIntStateOf(defaultDigitCount) }
+    // Инициализируем digitCount на основе длины reading или defaultDigitCount
+    var digitCount by remember(reading) {
+        mutableIntStateOf(
+            if (reading.isNotEmpty()) reading.length else defaultDigitCount
+        )
+    }
+
     var digitValues by remember { mutableStateOf(List(digitCount) { 0 }) }
     val digitsList = remember { (0..9).toList() }
 
-    // Синхронизация значений с reading
+    // Обновляем digitCount при изменении reading
     LaunchedEffect(reading) {
         if (reading.isNotEmpty()) {
+            val newDigitCount = reading.length
+            if (newDigitCount != digitCount) {
+                digitCount = newDigitCount
+            }
+
             digitValues = reading
-                .padStart(digitCount, '0')
                 .take(digitCount)
                 .map { it.digitToIntOrNull() ?: 0 }
         }
@@ -72,7 +81,11 @@ fun MeterReadingBottomSheet(
         } else {
             digitValues.take(digitCount)
         }
-        onReadingChange(digitValues.joinToString(""))
+
+        // Обновляем reading только если он пустой или его длина не соответствует digitCount
+        if (reading.isEmpty() || reading.length != digitCount) {
+            onReadingChange(digitValues.joinToString(""))
+        }
     }
 
     // Обновление reading при изменении digitValues
@@ -80,14 +93,27 @@ fun MeterReadingBottomSheet(
         onReadingChange(digitValues.joinToString(""))
     }
 
-    FlexibleBottomSheet(
-        sheetState = rememberFlexibleBottomSheetState(
-            flexibleSheetSize = FlexibleSheetSize(
-                fullyExpanded = 0.85f,
-                intermediatelyExpanded = 0.5f,
-                slightlyExpanded = 0.25f
-            )
+    val sheetState = rememberFlexibleBottomSheetState(
+        flexibleSheetSize = FlexibleSheetSize(
+            intermediatelyExpanded = 0.35f,
+            fullyExpanded = 0.75f,
         ),
+        skipSlightlyExpanded = true,
+        allowNestedScroll = false
+    )
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(isScanning) {
+        scope.launch {
+            if (isScanning) {
+                sheetState.intermediatelyExpand()
+            } else {
+                sheetState.fullyExpand()
+            }
+        }
+    }
+
+    FlexibleBottomSheet(
+        sheetState = sheetState,
         onDismissRequest = onDismissBottomSheet,
     ) {
         Column(
@@ -110,6 +136,11 @@ fun MeterReadingBottomSheet(
                     if (newValue.all { it.isDigit() }) {
                         onReadingChange(newValue)
                         // Обновляем барабанчики
+                        val newDigitCount = newValue.length
+                        if (newDigitCount != digitCount && newDigitCount > 0) {
+                            digitCount = newDigitCount
+                        }
+
                         digitValues = newValue
                             .padStart(digitCount, '0')
                             .take(digitCount)
@@ -124,113 +155,95 @@ fun MeterReadingBottomSheet(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Кнопки
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+            OutlinedButton(
+                onClick = onRetryScanning,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
             ) {
-                OutlinedButton(
-                    onClick = onRetryScanning,
-                    modifier = Modifier.weight(1f),
-                    enabled = !isLoading
-                ) {
-                    Text(stringResource(R.string.try_again))
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Button(
-                    onClick = onSave,
-                    modifier = Modifier.weight(1f),
-                    enabled = reading.isNotEmpty() && !isLoading
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    } else {
-                        Text(stringResource(R.string.save))
-                    }
-                }
+                Text(stringResource(R.string.save))
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            HorizontalDivider()
-            Spacer(modifier = Modifier.height(16.dp))
 
-            // Барабанчики для редактирования
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
+            if (!isScanning) {
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Барабанчики для редактирования
+                Card(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
-                        text = "Редактировать показания",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Ряд барабанчиков
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                    Column(
+                        modifier = Modifier.padding(16.dp)
                     ) {
-                        digitValues.forEachIndexed { index, value ->
-                            Box(
-                                modifier = Modifier.weight(1f),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                ListPicker(
-                                    initialValue = value,
-                                    values = digitsList,
-                                    onValueChange = { newValue ->
-                                        val newDigitValues = digitValues.toMutableList()
-                                        newDigitValues[index] = newValue
-                                        digitValues = newDigitValues
-                                    },
-                                    wrapSelectorWheel = true,
-                                    format = { this.toString() },
-                                    parse = {
-                                        try {
-                                            takeIf { it.matches(integerOnlyRegex) }?.toInt()
-                                        } catch (_: NumberFormatException) {
-                                            null
-                                        }
-                                    },
-                                    enableEdition = false, // Отключаем редактирование через клавиатуру
-                                    beyondViewportPageCount = 1,
-                                    textStyle = MaterialTheme.typography.headlineSmall.copy(
-                                        textAlign = TextAlign.Center
-                                    ),
-                                    verticalPadding = 8.dp,
-                                    keyboardType = KeyboardType.Number,
-                                    modifier = Modifier.height(120.dp)
-                                )
+                        Text(
+                            text = "Редактировать показания",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Ряд барабанчиков
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            digitValues.forEachIndexed { index, value ->
+                                Box(
+                                    modifier = Modifier.weight(1f),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    // Чтобы ListPicker обновлялся при изменении value,
+                                    // используем key для пересоздания компонента
+                                    key(value) {
+                                        ListPicker(
+                                            initialValue = value,
+                                            values = digitsList,
+                                            onValueChange = { newValue ->
+                                                val newDigitValues = digitValues.toMutableList()
+                                                newDigitValues[index] = newValue
+                                                digitValues = newDigitValues
+                                            },
+                                            wrapSelectorWheel = true,
+                                            format = { this.toString() },
+                                            parse = {
+                                                try {
+                                                    takeIf { it.matches(integerOnlyRegex) }?.toInt()
+                                                } catch (_: NumberFormatException) {
+                                                    null
+                                                }
+                                            },
+                                            enableEdition = false, // Отключаем редактирование через клавиатуру
+                                            beyondViewportPageCount = 1,
+                                            textStyle = MaterialTheme.typography.headlineSmall.copy(
+                                                textAlign = TextAlign.Center
+                                            ),
+                                            verticalPadding = 8.dp,
+                                            keyboardType = KeyboardType.Number,
+                                            modifier = Modifier.height(120.dp)
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Слайдер для количества цифр
+                SliderWithLabels(
+                    value = digitCount,
+                    onValueChange = { newCount ->
+                        digitCount = newCount
+                    },
+                    range = 1..8,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Слайдер для количества цифр
-            SliderWithLabels(
-                value = digitCount,
-                onValueChange = { newCount ->
-                    digitCount = newCount
-                },
-                range = 3..8,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
@@ -242,12 +255,12 @@ fun MeterReadingBottomSheetWithPickerPreview() {
         var reading by remember { mutableStateOf("123456") }
         MeterReadingBottomSheet(
             reading = reading,
+            isScanning = false,
             onReadingChange = { reading = it },
             onSave = {},
             onRetryScanning = {},
             onDismissBottomSheet = {},
-            isLoading = false,
-            defaultDigitCount = 6
+            defaultDigitCount = 4
         )
     }
 }

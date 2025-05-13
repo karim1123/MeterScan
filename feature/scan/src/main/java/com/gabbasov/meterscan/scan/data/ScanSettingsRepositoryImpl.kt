@@ -57,7 +57,7 @@ class ScanSettingsRepositoryImpl(
         private const val KEY_DEFAULT_DIGIT_COUNT = "key_default_digit_count" // Высокий порог
 
         // Значения по умолчанию
-        private const val DEFAULT_BUFFER_SIZE = 30 // Накапливаем 30 кадров
+        private const val DEFAULT_BUFFER_SIZE = 10 // Накапливаем 30 кадров
         private const val DEFAULT_CONFIDENCE_THRESHOLD = 0.5f // 50% уверенность для базового порога
         private const val DEFAULT_HIGH_CONFIDENCE_THRESHOLD = 0.95f // 95% для высокого порога
         private const val DEFAULT_DIGIT_COUNT = 4

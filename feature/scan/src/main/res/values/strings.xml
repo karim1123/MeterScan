@@ -4,7 +4,7 @@
     <string name="meter_reading">Показания счетчика</string>
     <string name="camera_permission_required">Для сканирования показаний необходим доступ к камере</string>
     <string name="grant_permission">Предоставить доступ</string>
-    <string name="enter_meter_reading">Введите показания счетчика</string>
+    <string name="enter_meter_reading">Показания счетчика</string>
     <string name="cancel">Отмена</string>
     <string name="save">Сохранить</string>
     <string name="try_again">Повторить</string>
