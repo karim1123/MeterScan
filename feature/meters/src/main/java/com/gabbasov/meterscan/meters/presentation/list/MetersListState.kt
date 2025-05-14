@@ -11,6 +11,8 @@ import kotlinx.collections.immutable.persistentListOf
 @Stable
 internal data class MetersListState(
     val meters: ImmutableList<Meter> = persistentListOf(),
+    val filteredMeters: ImmutableList<Meter> = persistentListOf(),
+    val searchQuery: String = "",
     override val isLoading: Boolean = false,
     override val error: Text? = null,
 ) : BaseState()
@@ -18,5 +20,6 @@ internal data class MetersListState(
 internal sealed interface MetersListAction : BaseAction {
     data object LoadMeters : MetersListAction
     data class MeterSelected(val meterId: String) : MetersListAction
+    data class SearchMeters(val query: String) : MetersListAction
     data object AddNewMeter : MetersListAction
 }

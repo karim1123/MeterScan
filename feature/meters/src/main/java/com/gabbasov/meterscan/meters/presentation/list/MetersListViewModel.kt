@@ -3,6 +3,7 @@ package com.gabbasov.meterscan.meters.presentation.list
 import androidx.lifecycle.viewModelScope
 import com.gabbasov.meterscan.repository.MetersRepository
 import com.gabbasov.meterscan.base.Resource
+import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.ui.BaseViewModel
 import com.gabbasov.meterscan.ui.Text
 import kotlinx.collections.immutable.toImmutableList
@@ -33,6 +34,7 @@ internal class MetersListViewModel(
             is MetersListAction.LoadMeters -> loadMeters()
             is MetersListAction.MeterSelected -> Unit // Обработка в координаторе
             is MetersListAction.AddNewMeter -> Unit // Обработка в координаторе
+            is MetersListAction.SearchMeters -> searchMeters(action.query)
         }
     }
 
@@ -45,6 +47,7 @@ internal class MetersListViewModel(
                     state.copy(
                         isLoading = false,
                         meters = result.data.toImmutableList(),
+                        filteredMeters = filterMeters(result.data, state.searchQuery).toImmutableList(),
                         error = null
                     )
                 }
@@ -58,6 +61,25 @@ internal class MetersListViewModel(
                     )
                 }
             }
+        }
+    }
+
+    private fun searchMeters(query: String) {
+        state = state.copy(
+            searchQuery = query,
+            filteredMeters = filterMeters(state.meters, query).toImmutableList()
+        )
+    }
+
+    private fun filterMeters(meters: List<Meter>, query: String): List<Meter> {
+        if (query.isBlank()) return meters
+
+        val lowercaseQuery = query.lowercase()
+        return meters.filter { meter ->
+            meter.number.lowercase().contains(lowercaseQuery) ||
+                    meter.address.lowercase().contains(lowercaseQuery) ||
+                    meter.owner.lowercase().contains(lowercaseQuery) ||
+                    meter.type.name.lowercase().contains(lowercaseQuery)
         }
     }
 }

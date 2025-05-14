@@ -20,6 +20,10 @@ internal class MetersListCoordinator(
     fun onRefresh() {
         viewModel.execute(MetersListAction.LoadMeters)
     }
+
+    fun onSearchQueryChanged(query: String) {
+        viewModel.execute(MetersListAction.SearchMeters(query))
+    }
 }
 
 @Composable
