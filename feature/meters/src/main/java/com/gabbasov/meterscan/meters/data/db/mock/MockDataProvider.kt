@@ -3,6 +3,7 @@ package com.gabbasov.meterscan.meters.data.db.mock
 import com.gabbasov.meterscan.meters.data.db.MeterEntity
 import com.gabbasov.meterscan.meters.data.db.MeterScanDatabase
 import com.gabbasov.meterscan.meters.data.db.ReadingEntity
+import com.gabbasov.meterscan.model.meter.Address
 import com.gabbasov.meterscan.model.meter.MeterType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,12 +31,33 @@ class MockDataProvider(private val database: MeterScanDatabase) {
      * Заполняет базу данных тестовыми данными
      */
     private suspend fun populateMockData() = withContext(Dispatchers.IO) {
+        // Адреса в Ижевске с координатами
         val izhevskAddresses = listOf(
-            "г. Ижевск, ул. Пушкинская, д. 278, кв. 15",
-            "г. Ижевск, ул. Удмуртская, д. 304, кв. 78",
-            "г. Ижевск, ул. Ленина, д. 45, кв. 3",
-            "г. Ижевск, ул. Молодежная, д. 111, кв. 144",
-            "г. Ижевск, ул. Советская, д. 22, кв. 21"
+            Address(
+                street = "г. Ижевск, ул. Пушкинская, д. 278, кв. 15",
+                latitude = 56.8498,
+                longitude = 53.2045
+            ),
+            Address(
+                street = "г. Ижевск, ул. Удмуртская, д. 304, кв. 78",
+                latitude = 56.8567,
+                longitude = 53.2112
+            ),
+            Address(
+                street = "г. Ижевск, ул. Ленина, д. 45, кв. 3",
+                latitude = 56.8443,
+                longitude = 53.2067
+            ),
+            Address(
+                street = "г. Ижевск, ул. Молодежная, д. 111, кв. 144",
+                latitude = 56.8612,
+                longitude = 53.2234
+            ),
+            Address(
+                street = "г. Ижевск, ул. Советская, д. 22, кв. 21",
+                latitude = 56.8489,
+                longitude = 53.2098
+            )
         )
 
         val meters = listOf(
@@ -59,7 +81,7 @@ class MockDataProvider(private val database: MeterScanDatabase) {
     private fun createMockMeter(
         type: MeterType,
         number: String,
-        address: String,
+        address: Address,
         owner: String
     ): MeterEntity {
         val now = LocalDate.now()

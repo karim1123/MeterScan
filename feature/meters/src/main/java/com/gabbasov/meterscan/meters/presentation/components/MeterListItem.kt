@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.gabbasov.meterscan.model.meter.Address
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.model.meter.MeterType
 import java.time.LocalDate
@@ -54,7 +55,7 @@ fun MeterListItem(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = meter.address,
+                    text = meter.address.getFullAddress(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -76,7 +77,11 @@ private fun MeterListItemPreview() {
                 id = "1",
                 type = MeterType.ELECTRICITY,
                 number = "12345678",
-                address = "ул. Примерная, д. 1, кв. 123",
+                address = Address(
+                    street = "Улица Пушкина, дом 1",
+                    latitude = 55.7558,
+                    longitude = 37.6173
+                ),
                 owner = "Иванов И.И.",
                 installationDate = LocalDate.of(2022, 1, 15),
                 nextCheckDate = LocalDate.of(2026, 1, 15)

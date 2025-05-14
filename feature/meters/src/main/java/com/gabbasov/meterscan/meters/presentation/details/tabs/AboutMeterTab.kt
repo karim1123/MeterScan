@@ -20,6 +20,7 @@ import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.model.meter.MeterReading
 import com.gabbasov.meterscan.model.meter.MeterType
 import com.gabbasov.meterscan.meters.presentation.details.components.InfoRow
+import com.gabbasov.meterscan.model.meter.Address
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -43,7 +44,7 @@ fun AboutMeterTab(meter: Meter) {
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                InfoRow(label = "Адрес:", value = meter.address)
+                InfoRow(label = "Адрес:", value = meter.address.getFullAddress())
                 InfoRow(label = "Владелец:", value = meter.owner)
                 InfoRow(
                     label = "Дата установки:",
@@ -78,7 +79,11 @@ fun AboutMeterTab(meter: Meter) {
 fun AboutMeterTabPreview() {
     val meter = Meter(
         id = "12321",
-        address = "г. Москва, ул. Ленина, д. 1",
+        address = Address(
+            street = "Улица Пушкина, дом 1",
+            latitude = 55.7558,
+            longitude = 37.6173
+        ),
         owner = "Иванов И.И.",
         installationDate = LocalDate.of(2020, 1, 1),
         nextCheckDate = LocalDate.of(2025, 1, 1),

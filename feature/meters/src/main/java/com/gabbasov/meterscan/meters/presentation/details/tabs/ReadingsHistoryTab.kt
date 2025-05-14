@@ -40,6 +40,7 @@ import com.gabbasov.meterscan.meters.presentation.details.components.ReadingList
 import com.gabbasov.meterscan.meters.presentation.details.components.YearConsumptionChart
 import com.gabbasov.meterscan.meters.presentation.details.getMeterUnits
 import com.gabbasov.meterscan.meters.presentation.details.prepareMonthlyData
+import com.gabbasov.meterscan.model.meter.Address
 import java.time.LocalDate
 import java.time.Month
 import java.time.format.TextStyle
@@ -261,7 +262,11 @@ fun ReadingsHistoryTab(meter: Meter) {
 fun ReadingsHistoryTabPreview() {
     val meter = Meter(
         id = "12321",
-        address = "г. Москва, ул. Ленина, д. 1",
+        address = Address(
+            street = "Улица Пушкина, дом 1",
+            latitude = 55.7558,
+            longitude = 37.6173
+        ),
         owner = "Иванов И.И.",
         installationDate = LocalDate.of(2020, 1, 1),
         nextCheckDate = LocalDate.of(2025, 1, 1),

@@ -15,10 +15,18 @@ data class Meter(
     val id: String,
     val type: MeterType,
     val number: String,
-    val address: String,
+    val address: Address,
     val owner: String,
     val readings: List<MeterReading> = emptyList(),
     val installationDate: LocalDate,
     val nextCheckDate: LocalDate,
     val notes: String? = null
 )
+
+data class Address(
+    val street: String,
+    val latitude: Double? = null,
+    val longitude: Double? = null
+) {
+    fun getFullAddress(): String = street
+}

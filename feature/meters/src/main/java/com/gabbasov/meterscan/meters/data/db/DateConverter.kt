@@ -1,7 +1,9 @@
 package com.gabbasov.meterscan.meters.data.db
 
 import androidx.room.TypeConverter
+import com.gabbasov.meterscan.model.meter.Address
 import com.gabbasov.meterscan.model.meter.MeterType
+import com.google.gson.Gson
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -28,5 +30,19 @@ class MeterTypeConverter {
     @TypeConverter
     fun toMeterType(value: String): MeterType {
         return MeterType.valueOf(value)
+    }
+}
+
+class AddressConverter {
+    private val gson = Gson()
+
+    @TypeConverter
+    fun fromAddress(address: Address?): String? {
+        return address?.let { gson.toJson(it) }
+    }
+
+    @TypeConverter
+    fun toAddress(addressString: String?): Address? {
+        return addressString?.let { gson.fromJson(it, Address::class.java) }
     }
 }

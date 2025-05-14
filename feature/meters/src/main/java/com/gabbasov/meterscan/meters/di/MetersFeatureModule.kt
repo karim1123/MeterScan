@@ -22,7 +22,6 @@ val metersFeatureModule = module {
             MeterScanDatabase::class.java,
             MeterScanDatabase.DATABASE_NAME
         )
-            .fallbackToDestructiveMigration()
             .build()
     }
     single { get<MeterScanDatabase>().meterDao() }

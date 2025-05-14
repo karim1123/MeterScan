@@ -1,5 +1,6 @@
 package com.gabbasov.meterscan.meters.presentation.list
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.gabbasov.meterscan.repository.MetersRepository
 import com.gabbasov.meterscan.base.Resource
@@ -53,6 +54,7 @@ internal class MetersListViewModel(
                 }
 
                 is Resource.Error -> {
+                    Log.d("test312", "result.exception: ${result.exception}")
                     state.copy(
                         isLoading = false,
                         error = Text.RawString(
@@ -77,7 +79,7 @@ internal class MetersListViewModel(
         val lowercaseQuery = query.lowercase()
         return meters.filter { meter ->
             meter.number.lowercase().contains(lowercaseQuery) ||
-                    meter.address.lowercase().contains(lowercaseQuery) ||
+                    meter.address.getFullAddress().lowercase().contains(lowercaseQuery) ||
                     meter.owner.lowercase().contains(lowercaseQuery) ||
                     meter.type.name.lowercase().contains(lowercaseQuery)
         }
