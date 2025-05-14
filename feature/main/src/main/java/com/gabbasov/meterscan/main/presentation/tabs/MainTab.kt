@@ -7,5 +7,5 @@ enum class MainTab(val icon: Int, val titleResId: Int, val route: String) {
     CAMERA(R.drawable.ic_camera, R.string.tab_camera, NavigationRoute.METER_SCAN.route),
     WORK(R.drawable.ic_work, R.string.tab_work, "work_tab"),
     METERS(R.drawable.ic_meter, R.string.tab_meters, NavigationRoute.METERS_LIST.route),
-    SETTINGS(R.drawable.ic_settings, R.string.tab_settings, "settings_tab")
+    SETTINGS(R.drawable.ic_settings, R.string.tab_settings, NavigationRoute.SETTINGS.route)
 }
