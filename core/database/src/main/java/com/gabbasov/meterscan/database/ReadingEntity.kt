@@ -5,6 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import com.gabbasov.meterscan.database.converter.DateConverter
 import com.gabbasov.meterscan.model.meter.MeterReading
 import java.time.LocalDate
 import java.util.UUID
@@ -21,6 +22,7 @@ import java.util.UUID
     ],
     indices = [Index("meterId")]
 )
+
 @TypeConverters(DateConverter::class)
 data class ReadingEntity(
     @PrimaryKey

@@ -94,15 +94,16 @@ class MeterScanViewModel(
         state = state.copy(isLoading = true)
 
         metersRepository.getAllMeters().collect { result ->
-            when (result) {
+            state = when (result) {
                 is Resource.Success -> {
-                    state = state.copy(
+                    state.copy(
                         allMeters = result.data,
                         isLoading = false
                     )
                 }
+
                 is Resource.Error -> {
-                    state = state.copy(
+                    state.copy(
                         error = Text.RawString("Ошибка загрузки счетчиков: ${result.exception.message}"),
                         isLoading = false
                     )
@@ -155,7 +156,7 @@ class MeterScanViewModel(
                 )
 
                 if (goBack) {
-                    delay(1000) // Небольшая задержка для отображения сообщения
+                    delay(1000)
                     state = state.copy(
                         navigateBack = true
                     )

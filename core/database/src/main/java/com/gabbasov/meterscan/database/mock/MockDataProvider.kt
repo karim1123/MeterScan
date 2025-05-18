@@ -4,6 +4,7 @@ import com.gabbasov.meterscan.database.MeterEntity
 import com.gabbasov.meterscan.database.MeterScanDatabase
 import com.gabbasov.meterscan.database.ReadingEntity
 import com.gabbasov.meterscan.model.meter.Address
+import com.gabbasov.meterscan.model.meter.MeterState
 import com.gabbasov.meterscan.model.meter.MeterType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -60,12 +61,13 @@ class MockDataProvider(private val database: MeterScanDatabase) {
             )
         )
 
+        // Создаем тестовые счетчики с разными состояниями
         val meters = listOf(
-            createMockMeter(MeterType.ELECTRICITY, "54762198", izhevskAddresses[0], "Иванов Иван Иванович"),
-            createMockMeter(MeterType.WATER, "78452196", izhevskAddresses[1], "Петров Петр Петрович"),
-            createMockMeter(MeterType.GAS, "12453698", izhevskAddresses[2], "Сидорова Мария Ивановна"),
-            createMockMeter(MeterType.ELECTRICITY, "89541237", izhevskAddresses[3], "Кузнецов Алексей Викторович"),
-            createMockMeter(MeterType.WATER, "74125638", izhevskAddresses[4], "Иванов Иван Иванович")
+            createMockMeter(MeterType.ELECTRICITY, "54762198", izhevskAddresses[0], "Иванов Иван Иванович", MeterState.REQUIRED),
+            createMockMeter(MeterType.WATER, "78452196", izhevskAddresses[1], "Петров Петр Петрович", MeterState.NOT_REQUIRED),
+            createMockMeter(MeterType.GAS, "12453698", izhevskAddresses[2], "Сидорова Мария Ивановна", MeterState.REQUIRED),
+            createMockMeter(MeterType.ELECTRICITY, "89541237", izhevskAddresses[3], "Кузнецов Алексей Викторович", MeterState.REQUIRED),
+            createMockMeter(MeterType.WATER, "74125638", izhevskAddresses[4], "Иванов Иван Иванович", MeterState.REQUIRED)
         )
 
         meters.forEach { meter ->
@@ -82,7 +84,8 @@ class MockDataProvider(private val database: MeterScanDatabase) {
         type: MeterType,
         number: String,
         address: Address,
-        owner: String
+        owner: String,
+        state: MeterState = MeterState.REQUIRED
     ): MeterEntity {
         val now = LocalDate.now()
         return MeterEntity(
@@ -93,7 +96,8 @@ class MockDataProvider(private val database: MeterScanDatabase) {
             owner = owner,
             installationDate = now.minusMonths(Random.nextLong(6, 36)),
             nextCheckDate = now.plusMonths(Random.nextLong(12, 48)),
-            notes = if (Random.nextBoolean()) getMockNote(type) else null
+            notes = if (Random.nextBoolean()) getMockNote(type) else null,
+            state = state
         )
     }
 
