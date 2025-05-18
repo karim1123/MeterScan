@@ -6,4 +6,9 @@
     <string name="error_short_password">Password must be at least 6 characters</string>
     <string name="error_passwords_do_not_match">Passwords do not match</string>
     <string name="error_unknown">Unknown error</string>
+    <string name="search_meters_placeholder">Поиск по номеру, адресу, владельцу...</string>
+    <string name="meters_not_found">Счетчики не найдены</string>
+    <string name="no_meters_available">Нет доступных счетчиков</string>
+    <string name="clear_search">Очистить поиск</string>
+    <string name="search">Поиск</string>
 </resources>

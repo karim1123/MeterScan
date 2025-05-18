@@ -2,8 +2,8 @@ package com.gabbasov.meterscan.auth.presentation.signup
 
 import androidx.compose.runtime.Stable
 import com.gabbasov.meterscan.auth.R
-import com.gabbasov.meterscan.domain.BaseAction
-import com.gabbasov.meterscan.domain.BaseState
+import com.gabbasov.meterscan.domain.base.BaseAction
+import com.gabbasov.meterscan.domain.base.BaseState
 import com.gabbasov.meterscan.ui.Text
 import com.gabbasov.meterscan.ui.TextFieldValue
 

@@ -1,8 +1,8 @@
-package com.gabbasov.meterscan.meters.data.db.mock
+package com.gabbasov.meterscan.database.mock
 
-import com.gabbasov.meterscan.meters.data.db.MeterEntity
-import com.gabbasov.meterscan.meters.data.db.MeterScanDatabase
-import com.gabbasov.meterscan.meters.data.db.ReadingEntity
+import com.gabbasov.meterscan.database.MeterEntity
+import com.gabbasov.meterscan.database.MeterScanDatabase
+import com.gabbasov.meterscan.database.ReadingEntity
 import com.gabbasov.meterscan.model.meter.Address
 import com.gabbasov.meterscan.model.meter.MeterType
 import kotlinx.coroutines.Dispatchers

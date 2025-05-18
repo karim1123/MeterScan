@@ -1,22 +1,19 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.google.services)
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.gabbasov.meterscan"
+    namespace = "com.gabbasov.meterscan.work"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.gabbasov.meterscan"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -34,44 +31,50 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
-    }
-    buildFeatures {
-        compose = true
+        freeCompilerArgs += listOf("-Xcontext-receivers")
     }
 }
 
 dependencies {
-    implementation(project(":core:designsystem"))
-    implementation(project(":core:common"))
-    implementation(project(":core:feature-api"))
-    implementation(project(":core:network"))
-    implementation(project(":core:database"))
     implementation(project(":core:domain"))
-    implementation(project(":feature:auth"))
-    implementation(project(":feature:main"))
-    implementation(project(":feature:meters"))
-    implementation(project(":feature:settings"))
-    implementation(project(":feature:scan"))
+    implementation(project(":core:common"))
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:network"))
+    implementation(project(":core:feature-api"))
 
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.kotlinx.collections.immutable)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.accompanist.navigation.animation)
     debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.timber)
 
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-
     implementation(project.dependencies.platform(libs.koin.bom))
-    implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.core)
+
+    implementation(libs.androidx.material)
+
+    // Room dependencies
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    // Изображения
+    implementation(libs.coil.compose)
+
+    implementation (libs.compose.charts)
+
+    implementation("com.google.code.gson:gson:2.10.1")
 }

@@ -1,9 +1,9 @@
 package com.gabbasov.meterscan.meters.data
 
-import com.gabbasov.meterscan.meters.data.db.MeterDao
-import com.gabbasov.meterscan.meters.data.db.MeterEntity
-import com.gabbasov.meterscan.meters.data.db.ReadingDao
-import com.gabbasov.meterscan.meters.data.db.ReadingEntity
+import com.gabbasov.meterscan.database.MeterDao
+import com.gabbasov.meterscan.database.MeterEntity
+import com.gabbasov.meterscan.database.ReadingDao
+import com.gabbasov.meterscan.database.ReadingEntity
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.repository.MetersRepository
 import com.gabbasov.meterscan.base.Resource
