@@ -14,7 +14,7 @@ internal class WorkMetersListCoordinator(
 
     fun onMeterSelected(meterId: String) {
         viewModel.execute(WorkMetersListAction.MeterSelected(meterId))
-        navController.navigate("${NavigationRoute.METER_DETAILS}/$meterId")
+        //navController.navigate("${NavigationRoute.METER_DETAILS}/$meterId")
     }
 
     fun onRefresh() {

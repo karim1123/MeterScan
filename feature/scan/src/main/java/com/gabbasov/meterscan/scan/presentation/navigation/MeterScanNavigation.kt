@@ -53,7 +53,7 @@ class MeterScanNavigation : MeterScanFeatureApi {
         ) {
             MeterScanScreenRoute(
                 coordinator = rememberMeterScanCoordinator(navController = navController),
-                meterId = "cb5383a5-8fe4-4895-94bf-82208489b10e"
+                meterId = null
             )
         }
 

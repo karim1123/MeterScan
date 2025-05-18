@@ -14,7 +14,7 @@ class SettingsRepositoryImpl(
         context.getSharedPreferences(SETTINGS_PREFS, Context.MODE_PRIVATE)
 
     override suspend fun getCameraMode(): Boolean = withContext(Dispatchers.IO) {
-        prefs.getBoolean(KEY_CAMERA_MODE, false)
+        prefs.getBoolean(KEY_CAMERA_MODE, true)
     }
 
     override suspend fun saveCameraMode(enabled: Boolean) = withContext(Dispatchers.IO) {

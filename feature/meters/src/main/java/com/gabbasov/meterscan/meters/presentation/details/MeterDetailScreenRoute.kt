@@ -1,6 +1,5 @@
 package com.gabbasov.meterscan.meters.presentation.details
 
-
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,9 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,26 +21,33 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.gabbasov.meterscan.model.meter.Meter
-import com.gabbasov.meterscan.ui.components.meters.MeterTypeIcon
+import com.gabbasov.meterscan.meters.R
 import com.gabbasov.meterscan.meters.presentation.details.tabs.AboutMeterTab
 import com.gabbasov.meterscan.meters.presentation.details.tabs.ReadingsHistoryTab
+import com.gabbasov.meterscan.model.meter.Address
+import com.gabbasov.meterscan.model.meter.Meter
+import com.gabbasov.meterscan.model.meter.MeterReading
+import com.gabbasov.meterscan.model.meter.MeterType
+import com.gabbasov.meterscan.ui.components.meters.MeterTypeIcon
+import com.gabbasov.meterscan.ui.dialog.LowerValueWarningDialog
+import com.gabbasov.meterscan.ui.dialog.ReadingInputDialog
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +58,6 @@ internal fun MeterDetailScreenRoute(
     val state by coordinator.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(meterId) {
         coordinator.loadMeter(meterId)
@@ -67,27 +71,28 @@ internal fun MeterDetailScreenRoute(
         }
     }
 
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Удаление счетчика") },
-            text = { Text("Вы уверены, что хотите удалить этот счетчик?") },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        showDeleteDialog = false
-                        coordinator.onDeleteMeter()
-                    }
-                ) {
-                    Text("Удалить")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Отмена")
-                }
-            }
+    if (state.showReadingDialog) {
+        ReadingInputDialog(
+            lastReading = state.meter?.readings?.maxByOrNull { it.date }?.value,
+            onDismiss = { coordinator.onDismissReadingDialog() },
+            onSave = { coordinator.onSaveReading(it) }
         )
+    }
+
+    if (state.showLowerValueWarning) {
+        LowerValueWarningDialog(
+            reading = state.newReading,
+            lastReading = state.meter?.readings?.maxByOrNull { it.date }?.value ?: 0.0,
+            onConfirm = { coordinator.onConfirmLowerValue() },
+            onEdit = { coordinator.onDismissLowerValueWarning() },
+            onDismiss = { coordinator.onDismissLowerValueWarning() }
+        )
+    }
+
+    LaunchedEffect(state.navigateToScan) {
+        state.navigateToScan?.let { meterId ->
+            coordinator.onNavigateToScan(meterId)
+        }
     }
 
     Scaffold(
@@ -102,20 +107,14 @@ internal fun MeterDetailScreenRoute(
                         )
                     }
                 },
-               /* actions = {
-                    IconButton(onClick = { coordinator.onEditMeter() }) {
+                actions = {
+                    IconButton(onClick = { coordinator.onAddReading() }) {
                         Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Редактировать"
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(R.string.add_reading)
                         )
                     }
-                    IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Удалить"
-                        )
-                    }
-                }*/
+                }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -131,7 +130,7 @@ internal fun MeterDetailScreenRoute(
             }
         } else {
             state.meter?.let { meter ->
-                RedesignedMeterDetailScreen(
+                MeterDetailsTabs(
                     modifier = Modifier.padding(paddingValues),
                     meter = meter
                 )
@@ -153,7 +152,7 @@ internal fun MeterDetailScreenRoute(
 }
 
 @Composable
-private fun RedesignedMeterDetailScreen(
+private fun MeterDetailsTabs(
     modifier: Modifier = Modifier,
     meter: Meter
 ) {
@@ -218,4 +217,31 @@ private fun RedesignedMeterDetailScreen(
             1 -> ReadingsHistoryTab(meter)
         }
     }
+}
+
+@Preview
+@Composable
+private fun MeterDetailsTabsPreview() {
+    val meter = Meter(
+        id = "12321",
+        address = Address(
+            street = "Улица Пушкина, дом 1",
+            latitude = 55.7558,
+            longitude = 37.6173
+        ),
+        owner = "Иванов И.И.",
+        installationDate = LocalDate.of(2020, 1, 1),
+        nextCheckDate = LocalDate.of(2025, 1, 1),
+        notes = "Счетчик установлен в ванной комнате",
+        type = MeterType.ELECTRICITY,
+        number = "123456",
+        readings = listOf(
+            MeterReading(date = LocalDate.now(), value = 100.0),
+            MeterReading(date = LocalDate.now().minusMonths(1), value = 200.0)
+        )
+    )
+
+    MeterDetailsTabs(
+        meter = meter
+    )
 }
