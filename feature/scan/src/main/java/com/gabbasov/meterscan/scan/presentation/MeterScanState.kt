@@ -1,8 +1,8 @@
 package com.gabbasov.meterscan.scan.presentation
 
 import androidx.compose.runtime.Stable
-import com.gabbasov.meterscan.domain.BaseAction
-import com.gabbasov.meterscan.domain.BaseState
+import com.gabbasov.meterscan.domain.base.BaseAction
+import com.gabbasov.meterscan.domain.base.BaseState
 import com.gabbasov.meterscan.scan.domain.DigitBox
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -15,12 +15,12 @@ data class MeterScanState(
     val showBottomSheet: Boolean = false,
     val showErrorDialog: Boolean = false,
     val showSuccessMessage: Boolean = false,
-    val isScanning: Boolean = true,
+    val isScanning: Boolean = false,
     val recognitionProgress: Float = 0f,
     val stabilityScore: Float = 0f,
     val flashlightEnabled: Boolean = false,
     val cameraRotation: Int = 0, // 0, 90, 180, 270
-    val isPaused: Boolean = false,
+    val isPaused: Boolean = true,
     override val isLoading: Boolean = false,
     override val error: com.gabbasov.meterscan.ui.Text? = null
 ) : BaseState()

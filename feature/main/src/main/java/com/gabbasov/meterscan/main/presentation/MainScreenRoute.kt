@@ -91,7 +91,8 @@ fun MainScreen(
                                 viewModel = viewModel
                             )
                             MainTab.WORK -> WorkTabNavHost(
-                                navController = navController
+                                navController = navController,
+                                viewModel = viewModel
                             )
                             MainTab.METERS -> MetersTabNavHost(
                                 navController = navController,
@@ -151,15 +152,17 @@ fun CameraTabNavHost(
 // NavHost для вкладки Работа
 @Composable
 fun WorkTabNavHost(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: MainViewModel
 ) {
     NavHost(
         navController = navController,
         startDestination = MainTab.WORK.route
     ) {
-        composable(MainTab.WORK.route) {
-            WorkScreen()
-        }
+        register(
+            navController = navController,
+            featureApi = viewModel.workFeatureApi,
+        )
     }
 }
 
@@ -194,13 +197,5 @@ fun SettingsTabNavHost(
             navController = navController,
             featureApi = viewModel.settingsFeatureApi,
         )
-    }
-}
-
-// Экраны
-@Composable
-fun WorkScreen() {
-    Box {
-        Text(text = "Экран работы")
     }
 }

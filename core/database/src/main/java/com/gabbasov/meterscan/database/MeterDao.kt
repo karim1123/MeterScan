@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.meters.data.db
+package com.gabbasov.meterscan.database
 
 import androidx.room.Dao
 import androidx.room.Delete

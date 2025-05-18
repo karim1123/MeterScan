@@ -1,8 +1,8 @@
 package com.gabbasov.meterscan.settings.presentation
 
 import androidx.compose.runtime.Stable
-import com.gabbasov.meterscan.domain.BaseAction
-import com.gabbasov.meterscan.domain.BaseState
+import com.gabbasov.meterscan.domain.base.BaseAction
+import com.gabbasov.meterscan.domain.base.BaseState
 import com.gabbasov.meterscan.model.navigator.NavigatorType
 
 @Stable

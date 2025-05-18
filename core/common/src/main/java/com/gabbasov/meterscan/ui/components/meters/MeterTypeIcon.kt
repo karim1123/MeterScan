@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.meters.presentation.components
+package com.gabbasov.meterscan.ui.components.meters
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.gabbasov.meterscan.meters.R
+import com.gabbasov.meterscan.R
 import com.gabbasov.meterscan.model.meter.MeterType
 
 @Composable

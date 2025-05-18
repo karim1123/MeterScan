@@ -39,7 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gabbasov.meterscan.model.meter.Meter
-import com.gabbasov.meterscan.meters.presentation.components.MeterTypeIcon
+import com.gabbasov.meterscan.ui.components.meters.MeterTypeIcon
 import com.gabbasov.meterscan.meters.presentation.details.tabs.AboutMeterTab
 import com.gabbasov.meterscan.meters.presentation.details.tabs.ReadingsHistoryTab
 import kotlinx.coroutines.launch

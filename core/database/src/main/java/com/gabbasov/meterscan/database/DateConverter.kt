@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.meters.data.db
+package com.gabbasov.meterscan.database
 
 import androidx.room.TypeConverter
 import com.gabbasov.meterscan.model.meter.Address

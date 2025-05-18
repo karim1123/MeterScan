@@ -1,11 +1,11 @@
-package com.gabbasov.meterscan.meters.data.db
+package com.gabbasov.meterscan.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
 @Database(
     entities = [MeterEntity::class, ReadingEntity::class],
-    version = 2,
+    version = 1,
     exportSchema = false
 )
 abstract class MeterScanDatabase : RoomDatabase() {

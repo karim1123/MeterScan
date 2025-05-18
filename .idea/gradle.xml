@@ -27,6 +27,7 @@
             <option value="$PROJECT_DIR$/build-logic/convention" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/core/common" />
+            <option value="$PROJECT_DIR$/core/database" />
             <option value="$PROJECT_DIR$/core/designsystem" />
             <option value="$PROJECT_DIR$/core/domain" />
             <option value="$PROJECT_DIR$/core/feature-api" />
@@ -37,6 +38,7 @@
             <option value="$PROJECT_DIR$/feature/meters" />
             <option value="$PROJECT_DIR$/feature/scan" />
             <option value="$PROJECT_DIR$/feature/settings" />
+            <option value="$PROJECT_DIR$/feature/work" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

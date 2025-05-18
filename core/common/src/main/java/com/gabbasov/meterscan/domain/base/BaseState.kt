@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.domain
+package com.gabbasov.meterscan.domain.base
 
 import com.gabbasov.meterscan.ui.Text
 

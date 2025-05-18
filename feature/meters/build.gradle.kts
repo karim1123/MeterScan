@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:network"))
+    implementation(project(":core:database"))
     implementation(project(":core:feature-api"))
 
     implementation(libs.androidx.appcompat)
