@@ -10,7 +10,7 @@ import androidx.navigation.compose.composable
 import com.gabbasov.meterscan.NAVIGATION_DURATION
 import com.gabbasov.meterscan.NavigationRoute
 import com.gabbasov.meterscan.features.WorkFeatureApi
-import com.gabbasov.meterscan.work.presentation.list.WorkMetersListScreenRoute
+import com.gabbasov.meterscan.work.presentation.list.WorkScreenRoute
 import com.gabbasov.meterscan.work.presentation.list.rememberWorkMetersListCoordinator
 
 class WorkNavigation : WorkFeatureApi {
@@ -48,8 +48,8 @@ class WorkNavigation : WorkFeatureApi {
                 )
             }
         ) {
-            WorkMetersListScreenRoute(
-                rememberWorkMetersListCoordinator(navController = navController)
+            WorkScreenRoute(
+                coordinator = rememberWorkMetersListCoordinator(navController = navController)
             )
         }
     }

@@ -20,7 +20,8 @@ data class Meter(
     val readings: List<MeterReading> = emptyList(),
     val installationDate: LocalDate,
     val nextCheckDate: LocalDate,
-    val notes: String? = null
+    val notes: String? = null,
+    val state: MeterState = MeterState.REQUIRED
 )
 
 data class Address(

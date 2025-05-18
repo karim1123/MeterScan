@@ -8,6 +8,7 @@ import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.repository.MetersRepository
 import com.gabbasov.meterscan.base.Resource
 import com.gabbasov.meterscan.model.meter.MeterReading
+import com.gabbasov.meterscan.model.meter.MeterState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -124,9 +125,9 @@ class MetersRepositoryImpl(
                 value = reading
             )
 
-            // Объединяем отфильтрованные показания с новым
             val updatedMeter = meter.copy(
-                readings = filteredReadings + newReading
+                readings = filteredReadings + newReading,
+                state = MeterState.SUBMITTED_TO_SERVER
             )
 
             updateMeter(updatedMeter)
