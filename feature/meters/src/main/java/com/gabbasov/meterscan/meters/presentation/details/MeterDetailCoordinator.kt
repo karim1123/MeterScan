@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import com.gabbasov.meterscan.NavigationRoute
+import com.gabbasov.meterscan.ui.NavigationHolder
 import org.koin.androidx.compose.koinViewModel
 
 internal class MeterDetailCoordinator(
@@ -42,7 +43,7 @@ internal class MeterDetailCoordinator(
     }
 
     fun onNavigateToScan(meterId: String) {
-        navController.navigate("${NavigationRoute.METER_SCAN.route}/$meterId")
+        NavigationHolder.rootNavController?.navigate("${NavigationRoute.METER_SCAN.route}/$meterId")
         viewModel.execute(MeterDetailAction.NavigationHandled)
     }
 }
