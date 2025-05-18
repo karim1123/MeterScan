@@ -43,17 +43,24 @@ import com.gabbasov.meterscan.scan.domain.DigitBox
 import com.gabbasov.meterscan.scan.presentation.components.CameraView
 import com.gabbasov.meterscan.scan.presentation.components.DigitOverlayView
 import com.gabbasov.meterscan.scan.presentation.components.FlashlightControl
-import com.gabbasov.meterscan.scan.presentation.components.MeterReadingBottomSheet
+import com.gabbasov.meterscan.scan.presentation.components.bottomsheet.MeterReadingBottomSheet
 import com.gabbasov.meterscan.scan.presentation.components.RecognitionProgressIndicator
+import com.gabbasov.meterscan.scan.presentation.dialog.MeterSelectionDialog
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 
 @Composable
 internal fun MeterScanScreenRoute(
-    coordinator: MeterScanCoordinator
+    coordinator: MeterScanCoordinator,
+    meterId: String? = null
 ) {
     val uiState by coordinator.state.collectAsStateWithLifecycle()
+
+    // Загружаем счетчик при запуске экрана, если передан ID
+    LaunchedEffect(meterId) {
+        coordinator.loadMeter(meterId)
+    }
 
     MeterScanTheme {
         MeterScanScreen(
@@ -68,6 +75,9 @@ internal fun MeterScanScreenRoute(
             onToggleFlashlight = coordinator::onToggleFlashlight,
             onRotateCamera = coordinator::onRotateCamera,
             onTogglePause = coordinator::onTogglePause,
+            onShowMeterSelection = coordinator::onShowMeterSelection,
+            onHideMeterSelection = coordinator::onHideMeterSelection,
+            navigateToMetersList = coordinator::navigateToMetersList
         )
     }
 }
@@ -78,7 +88,7 @@ internal fun MeterScanScreen(
     state: MeterScanState,
     onDigitsDetected: (List<DigitBox>) -> Unit,
     onReadingUpdated: (String) -> Unit,
-    onSaveReading: (String) -> Unit,
+    onSaveReading: () -> Unit,
     onRetryScanning: () -> Unit,
     onDismissBottomSheet: () -> Unit,
     confidenceThreshold: Float,
@@ -86,6 +96,9 @@ internal fun MeterScanScreen(
     onToggleFlashlight: () -> Unit,
     onRotateCamera: () -> Unit,
     onTogglePause: () -> Unit,
+    onShowMeterSelection: () -> Unit,
+    onHideMeterSelection: () -> Unit,
+    navigateToMetersList: () -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -114,6 +127,13 @@ internal fun MeterScanScreen(
     val flashlightControl = remember { mutableStateOf<FlashlightControl?>(null) }
     var cameraView by remember { mutableStateOf<CameraView?>(null) }
 
+    if (state.showMeterSelection) {
+        MeterSelectionDialog(
+            onDismiss = onHideMeterSelection,
+            navigateToMetersList = navigateToMetersList
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -132,7 +152,6 @@ internal fun MeterScanScreen(
                         )
                     }
 
-                    // Кнопка поворота
                     IconButton(onClick = onRotateCamera) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_rotate),
@@ -140,7 +159,6 @@ internal fun MeterScanScreen(
                         )
                     }
 
-                    // Кнопка фонарика
                     IconButton(
                         onClick = {
                             flashlightControl.value?.let {
@@ -171,10 +189,12 @@ internal fun MeterScanScreen(
                     reading = state.meterReading,
                     isScanning = !state.isPaused,
                     onReadingChange = onReadingUpdated,
-                    onSave = { onSaveReading(state.meterReading) },
+                    onSave = onSaveReading,
                     onRetryScanning = onRetryScanning,
                     onDismissBottomSheet = onDismissBottomSheet,
-                    defaultDigitCount = state.meterReading.length
+                    defaultDigitCount = state.meterReading.length,
+                    selectedMeter = state.selectedMeter,
+                    onSelectMeter = onShowMeterSelection
                 )
             }
 

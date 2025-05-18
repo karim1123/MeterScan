@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.scan.presentation.components
+package com.gabbasov.meterscan.scan.presentation.components.bottomsheet
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,7 +32,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.scan.R
+import com.gabbasov.meterscan.scan.presentation.components.MeterInfoCard
+import com.gabbasov.meterscan.scan.presentation.components.SliderWithLabels
 import com.gabbasov.meterscan.scan.presentation.components.picker.ListPicker
 import com.gabbasov.meterscan.scan.presentation.components.picker.integerOnlyRegex
 import com.skydoves.flexible.bottomsheet.material3.FlexibleBottomSheet
@@ -48,7 +51,9 @@ fun MeterReadingBottomSheet(
     onSave: () -> Unit,
     onRetryScanning: () -> Unit,
     onDismissBottomSheet: () -> Unit,
-    defaultDigitCount: Int
+    defaultDigitCount: Int,
+    selectedMeter: Meter? = null,
+    onSelectMeter: () -> Unit
 ) {
     // Инициализируем digitCount на основе длины reading или defaultDigitCount
     var digitCount by remember(reading) {
@@ -95,12 +100,13 @@ fun MeterReadingBottomSheet(
 
     val sheetState = rememberFlexibleBottomSheetState(
         flexibleSheetSize = FlexibleSheetSize(
-            intermediatelyExpanded = 0.35f,
-            fullyExpanded = 0.75f,
+            intermediatelyExpanded = 0.5f,
+            fullyExpanded = 0.88f,
         ),
         skipSlightlyExpanded = true,
         allowNestedScroll = false
     )
+
     val scope = rememberCoroutineScope()
     LaunchedEffect(isScanning) {
         scope.launch {
@@ -114,7 +120,7 @@ fun MeterReadingBottomSheet(
 
     FlexibleBottomSheet(
         sheetState = sheetState,
-        onDismissRequest = onDismissBottomSheet,
+        onDismissRequest = onDismissBottomSheet
     ) {
         Column(
             modifier = Modifier
@@ -126,6 +132,23 @@ fun MeterReadingBottomSheet(
                 text = stringResource(R.string.meter_reading),
                 style = MaterialTheme.typography.headlineSmall
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Отображение выбранного счетчика или кнопки для выбора
+            if (selectedMeter != null) {
+                MeterInfoCard(
+                    meter = selectedMeter,
+                    onClick = onSelectMeter
+                )
+            } else {
+                OutlinedButton(
+                    onClick = onSelectMeter,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Выбрать счетчик")
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -156,25 +179,20 @@ fun MeterReadingBottomSheet(
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedButton(
-                onClick = onRetryScanning,
+                onClick = onSave,
                 modifier = Modifier.fillMaxWidth().height(48.dp),
+                enabled = selectedMeter != null // Кнопка активна только если выбран счетчик
             ) {
                 Text(stringResource(R.string.save))
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
+            // Остальной код для барабанчиков и слайдера
             if (!isScanning) {
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
                 // Барабанчики для редактирования
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             text = "Редактировать показания",
                             style = MaterialTheme.typography.titleMedium
@@ -192,8 +210,7 @@ fun MeterReadingBottomSheet(
                                     modifier = Modifier.weight(1f),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    // Чтобы ListPicker обновлялся при изменении value,
-                                    // используем key для пересоздания компонента
+                                    // Используем key для обновления при изменении value
                                     key(value) {
                                         ListPicker(
                                             initialValue = value,
@@ -212,7 +229,7 @@ fun MeterReadingBottomSheet(
                                                     null
                                                 }
                                             },
-                                            enableEdition = false, // Отключаем редактирование через клавиатуру
+                                            enableEdition = false,
                                             beyondViewportPageCount = 1,
                                             textStyle = MaterialTheme.typography.headlineSmall.copy(
                                                 textAlign = TextAlign.Center
@@ -233,16 +250,12 @@ fun MeterReadingBottomSheet(
                 // Слайдер для количества цифр
                 SliderWithLabels(
                     value = digitCount,
-                    onValueChange = { newCount ->
-                        digitCount = newCount
-                    },
+                    onValueChange = { newCount -> digitCount = newCount },
                     range = 1..8,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
@@ -260,7 +273,9 @@ fun MeterReadingBottomSheetWithPickerPreview() {
             onSave = {},
             onRetryScanning = {},
             onDismissBottomSheet = {},
-            defaultDigitCount = 4
+            defaultDigitCount = 4,
+            selectedMeter = null,
+            onSelectMeter = {}
         )
     }
 }

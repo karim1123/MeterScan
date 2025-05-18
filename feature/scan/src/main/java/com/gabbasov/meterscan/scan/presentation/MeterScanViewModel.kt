@@ -1,11 +1,16 @@
 package com.gabbasov.meterscan.scan.presentation
 
 import androidx.lifecycle.viewModelScope
+import com.gabbasov.meterscan.base.Resource
+import com.gabbasov.meterscan.model.meter.Meter
+import com.gabbasov.meterscan.repository.MetersRepository
 import com.gabbasov.meterscan.repository.ScanSettingsRepository
 import com.gabbasov.meterscan.scan.data.ScanSettingsRepositoryImpl.Companion.STABILITY_THRESHOLD
 import com.gabbasov.meterscan.scan.domain.DigitBox
 import com.gabbasov.meterscan.ui.BaseViewModel
+import com.gabbasov.meterscan.ui.Text
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -14,7 +19,8 @@ import timber.log.Timber
 import kotlin.math.abs
 
 class MeterScanViewModel(
-    private val scanSettingsRepository: ScanSettingsRepository
+    private val scanSettingsRepository: ScanSettingsRepository,
+    private val metersRepository: MetersRepository,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(MeterScanState())
     val uiState = _uiState.asStateFlow()
@@ -64,6 +70,85 @@ class MeterScanViewModel(
             is MeterScanAction.ToggleFlashlight -> toggleCamera()
             is MeterScanAction.RotateCamera -> rotateCamera()
             is MeterScanAction.TogglePause -> togglePause()
+            MeterScanAction.HideMeterSelection -> hideMeterSelection()
+            is MeterScanAction.LoadMeter -> loadMeter(action.meterId)
+            MeterScanAction.NavigateToMetersList -> Unit
+            is MeterScanAction.SelectMeter -> selectMeter(action.meter)
+            MeterScanAction.ShowMeterSelection -> showMeterSelection()
+        }
+    }
+
+    private fun loadMeter(meterId: String) = viewModelScope.launch {
+        if (meterId.isBlank()) return@launch
+
+        state = state.copy(isLoading = true)
+
+        metersRepository.getMeterById(meterId).collect { result ->
+            when (result) {
+                is Resource.Success -> {
+                    state = state.copy(
+                        selectedMeter = result.data,
+                        isLoading = false
+                    )
+                }
+                is Resource.Error -> {
+                    state = state.copy(
+                        isLoading = false,
+                        error = Text.RawString("Ошибка загрузки счетчика: ${result.exception.message}")
+                    )
+                }
+            }
+        }
+    }
+
+    private fun selectMeter(meter: Meter) {
+        state = state.copy(
+            selectedMeter = meter,
+            showMeterSelection = false
+        )
+    }
+
+    private fun showMeterSelection() {
+        state = state.copy(showMeterSelection = true)
+    }
+
+    private fun hideMeterSelection() {
+        state = state.copy(showMeterSelection = false)
+    }
+
+    private fun saveReading(reading: String) = viewModelScope.launch {
+        val meter = state.selectedMeter ?: return@launch
+
+        if (reading.isBlank()) {
+            state = state.copy(
+                error = Text.RawString("Показания не могут быть пустыми")
+            )
+            return@launch
+        }
+
+        val readingValue = reading.toDoubleOrNull()
+        if (readingValue == null) {
+            state = state.copy(
+                error = Text.RawString("Неверный формат показаний")
+            )
+            return@launch
+        }
+
+        when (val result = metersRepository.addReading(meter.id, readingValue)) {
+            is Resource.Success -> {
+                state = state.copy(
+                    showSuccessMessage = true,
+                    showBottomSheet = false
+                )
+
+                delay(2000)
+                state = state.copy(showSuccessMessage = false)
+            }
+            is Resource.Error -> {
+                state = state.copy(
+                    error = Text.RawString("Ошибка сохранения показаний: ${result.exception.message}")
+                )
+            }
         }
     }
 
@@ -207,10 +292,6 @@ class MeterScanViewModel(
         // Удаляем ведущие нули, но оставляем хотя бы один ноль если строка состоит только из нулей
         val trimmedReading = reading.trimStart('0').ifEmpty { "0" }
         state = state.copy(meterReading = trimmedReading)
-    }
-
-    private fun saveReading(reading: String) = viewModelScope.launch {
-
     }
 
     private fun retryScanning() {

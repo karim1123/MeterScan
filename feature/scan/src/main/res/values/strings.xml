@@ -17,4 +17,8 @@
     <string name="rotate_camera">Повернуть камеру</string>
     <string name="pause_scanning">Приостановить сканирование</string>
     <string name="resume_scanning">Возобновить сканирование</string>
+    <string name="select_meter_title">Выбор счетчика</string>
+    <string name="select_meter_message">Перейдите к списку счетчиков для выбора</string>
+    <string name="select_meter_decline">Отмена</string>
+    <string name="select_meter_confirm">Перейти</string>
 </resources>

@@ -10,5 +10,5 @@ import org.koin.dsl.module
 
 val scanModule = module {
     singleOf(::MeterScanNavigation) bind MeterScanFeatureApi::class
-    viewModel { MeterScanViewModel(get()) }
+    viewModel { MeterScanViewModel(get(), get()) }
 }

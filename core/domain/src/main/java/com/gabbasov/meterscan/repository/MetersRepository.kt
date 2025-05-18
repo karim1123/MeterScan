@@ -14,4 +14,6 @@ interface MetersRepository {
     suspend fun updateMeter(meter: Meter): Resource<Meter>
 
     suspend fun deleteMeter(id: String): Resource<Unit>
+
+    suspend fun addReading(meterId: String, reading: Double): Resource<Meter>
 }

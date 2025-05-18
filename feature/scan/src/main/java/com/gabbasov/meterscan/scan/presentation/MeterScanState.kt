@@ -3,6 +3,7 @@ package com.gabbasov.meterscan.scan.presentation
 import androidx.compose.runtime.Stable
 import com.gabbasov.meterscan.domain.base.BaseAction
 import com.gabbasov.meterscan.domain.base.BaseState
+import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.scan.domain.DigitBox
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -21,6 +22,8 @@ data class MeterScanState(
     val flashlightEnabled: Boolean = false,
     val cameraRotation: Int = 0, // 0, 90, 180, 270
     val isPaused: Boolean = true,
+    val selectedMeter: Meter? = null,
+    val showMeterSelection: Boolean = false,
     override val isLoading: Boolean = false,
     override val error: com.gabbasov.meterscan.ui.Text? = null
 ) : BaseState()
@@ -36,4 +39,9 @@ sealed interface MeterScanAction : BaseAction {
     data object ToggleFlashlight  : MeterScanAction
     data object RotateCamera : MeterScanAction
     data object TogglePause : MeterScanAction
+    data class LoadMeter(val meterId: String) : MeterScanAction
+    data class SelectMeter(val meter: Meter) : MeterScanAction
+    data object ShowMeterSelection : MeterScanAction
+    data object HideMeterSelection : MeterScanAction
+    data object NavigateToMetersList : MeterScanAction
 }

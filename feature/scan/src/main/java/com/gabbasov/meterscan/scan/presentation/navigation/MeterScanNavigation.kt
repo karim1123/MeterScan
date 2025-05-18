@@ -6,7 +6,9 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.gabbasov.meterscan.NAVIGATION_DURATION
 import com.gabbasov.meterscan.NavigationRoute
 import com.gabbasov.meterscan.features.MeterScanFeatureApi
@@ -21,6 +23,7 @@ class MeterScanNavigation : MeterScanFeatureApi {
         navController: NavHostController,
         modifier: Modifier
     ) {
+        // Маршрут без параметра meterId
         navGraphBuilder.composable(
             route = meterScanRoute(),
             enterTransition = {
@@ -49,7 +52,46 @@ class MeterScanNavigation : MeterScanFeatureApi {
             }
         ) {
             MeterScanScreenRoute(
-                coordinator = rememberMeterScanCoordinator(navController = navController)
+                coordinator = rememberMeterScanCoordinator(navController = navController),
+                meterId = "cb5383a5-8fe4-4895-94bf-82208489b10e"
+            )
+        }
+
+        // Маршрут с параметром meterId
+        navGraphBuilder.composable(
+            route = "${meterScanRoute()}/{meterId}",
+            arguments = listOf(
+                navArgument("meterId") { type = NavType.StringType }
+            ),
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(NAVIGATION_DURATION)
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { -it },
+                    animationSpec = tween(NAVIGATION_DURATION)
+                )
+            },
+            popEnterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = tween(NAVIGATION_DURATION)
+                )
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(NAVIGATION_DURATION)
+                )
+            }
+        ) { backStackEntry ->
+            val meterId = backStackEntry.arguments?.getString("meterId")
+            MeterScanScreenRoute(
+                coordinator = rememberMeterScanCoordinator(navController = navController),
+                meterId = meterId
             )
         }
     }

@@ -3,6 +3,8 @@ package com.gabbasov.meterscan.scan.presentation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
+import com.gabbasov.meterscan.NavigationRoute
+import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.scan.domain.DigitBox
 import org.koin.androidx.compose.koinViewModel
 
@@ -12,6 +14,12 @@ class MeterScanCoordinator(
 ) {
     val state = viewModel.uiState
 
+    fun loadMeter(meterId: String?) {
+        if (!meterId.isNullOrBlank()) {
+            viewModel.execute(MeterScanAction.LoadMeter(meterId))
+        }
+    }
+
     fun onDigitsDetected(digitBoxes: List<DigitBox>) {
         viewModel.execute(MeterScanAction.DetectDigits(digitBoxes))
     }
@@ -20,8 +28,9 @@ class MeterScanCoordinator(
         viewModel.execute(MeterScanAction.UpdateReading(reading))
     }
 
-    fun onSaveReading(reading: String) {
-        viewModel.execute(MeterScanAction.SaveReading(reading))
+    fun onSaveReading() {
+        val state = state.value
+        viewModel.execute(MeterScanAction.SaveReading(state.meterReading))
     }
 
     fun onRetryScanning() {
@@ -54,6 +63,22 @@ class MeterScanCoordinator(
 
     fun onTogglePause() {
         viewModel.execute(MeterScanAction.TogglePause)
+    }
+
+    fun onSelectMeter(meter: Meter) {
+        viewModel.execute(MeterScanAction.SelectMeter(meter))
+    }
+
+    fun onShowMeterSelection() {
+        viewModel.execute(MeterScanAction.ShowMeterSelection)
+    }
+
+    fun onHideMeterSelection() {
+        viewModel.execute(MeterScanAction.HideMeterSelection)
+    }
+
+    fun navigateToMetersList() {
+        navController.navigate(NavigationRoute.METERS_LIST.route)
     }
 }
 

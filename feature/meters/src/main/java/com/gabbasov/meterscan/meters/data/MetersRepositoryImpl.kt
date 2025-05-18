@@ -7,10 +7,13 @@ import com.gabbasov.meterscan.database.ReadingEntity
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.repository.MetersRepository
 import com.gabbasov.meterscan.base.Resource
+import com.gabbasov.meterscan.model.meter.MeterReading
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.time.LocalDate
 
 class MetersRepositoryImpl(
     private val meterDao: MeterDao,
@@ -92,6 +95,29 @@ class MetersRepositoryImpl(
         return try {
             meterDao.deleteMeterById(id)
             Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(e)
+        }
+    }
+
+    override suspend fun addReading(meterId: String, reading: Double): Resource<Meter> {
+        return try {
+            val meterResource = getMeterById(meterId).first()
+
+            if (meterResource is Resource.Error) {
+                return Resource.Error(Throwable("Счетчик не найден"))
+            }
+
+            val meter = (meterResource as Resource.Success).data
+            val newReading = MeterReading(
+                date = LocalDate.now(),
+                value = reading
+            )
+            val updatedMeter = meter.copy(
+                readings = meter.readings + newReading
+            )
+
+            updateMeter(updatedMeter)
         } catch (e: Exception) {
             Resource.Error(e)
         }
