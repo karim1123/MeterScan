@@ -1,8 +1,9 @@
 package com.gabbasov.meterscan.meters.presentation.details
 
 import androidx.lifecycle.viewModelScope
-import com.gabbasov.meterscan.repository.MetersRepository
 import com.gabbasov.meterscan.base.Resource
+import com.gabbasov.meterscan.repository.MetersRepository
+import com.gabbasov.meterscan.repository.SettingsRepository
 import com.gabbasov.meterscan.ui.BaseViewModel
 import com.gabbasov.meterscan.ui.Text
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +12,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal class MeterDetailViewModel(
-    private val metersRepository: MetersRepository
+    private val metersRepository: MetersRepository,
+    private val settingsRepository: SettingsRepository,
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(MeterDetailState())
     val uiState = _uiState.asStateFlow()
@@ -26,10 +28,17 @@ internal class MeterDetailViewModel(
         logAction(action)
         when (action) {
             is MeterDetailAction.LoadMeter -> loadMeter(action.meterId)
-            is MeterDetailAction.AddReading -> Unit // Обработка в координаторе
-            is MeterDetailAction.EditMeter -> Unit // Обработка в координаторе
-            is MeterDetailAction.DeleteMeter -> deleteMeter()
+            is MeterDetailAction.AddReading -> handleAddReading()
             is MeterDetailAction.NavigateBack -> Unit // Обработка в координаторе
+            is MeterDetailAction.SaveReading -> checkAndSaveReading(action.reading)
+            is MeterDetailAction.ConfirmLowerValue -> forceAddReading()
+            is MeterDetailAction.DismissReadingDialog -> state =
+                state.copy(showReadingDialog = false)
+
+            is MeterDetailAction.DismissLowerValueWarning -> state =
+                state.copy(showLowerValueWarning = false)
+
+            is MeterDetailAction.NavigationHandled -> state = state.copy(navigateToScan = null)
         }
     }
 
@@ -58,20 +67,57 @@ internal class MeterDetailViewModel(
         }
     }
 
-    private fun deleteMeter() = viewModelScope.launch {
-        val meterId = state.meter?.id ?: return@launch
-        state = state.copy(isLoading = true)
+    private fun handleAddReading() = viewModelScope.launch {
+        val currentMeter = state.meter ?: return@launch
+        val useCameraMode = settingsRepository.getCameraMode()
 
-        when (val result = metersRepository.deleteMeter(meterId)) {
+        state = if (useCameraMode) {
+            // Откроем экран сканирования с нужным ID
+            state.copy(navigateToScan = currentMeter.id)
+        } else {
+            // Покажем диалог ручного ввода
+            state.copy(showReadingDialog = true)
+        }
+    }
+
+    private fun checkAndSaveReading(reading: String) {
+        val readingValue = reading.toDoubleOrNull() ?: return
+        val currentMeter = state.meter ?: return
+
+        // Проверяем, что новые показания не меньше последних
+        val lastReading = currentMeter.readings.maxByOrNull { it.date }?.value ?: 0.0
+
+        if (readingValue < lastReading) {
+            state = state.copy(
+                showLowerValueWarning = true,
+                newReading = reading
+            )
+        } else {
+            addReadingToMeter(readingValue)
+        }
+    }
+
+    private fun forceAddReading() {
+        val readingValue = state.newReading.toDoubleOrNull() ?: return
+        addReadingToMeter(readingValue)
+        state = state.copy(showLowerValueWarning = false)
+    }
+
+    private fun addReadingToMeter(reading: Double) = viewModelScope.launch {
+        val meterId = state.meter?.id ?: return@launch
+        state = state.copy(isLoading = true, showReadingDialog = false)
+
+        when (val result = metersRepository.addReading(meterId, reading)) {
             is Resource.Success -> {
-                // Обработка успешного удаления выполняется в координаторе
-                state = state.copy(isLoading = false)
+                loadMeter(meterId) // Перезагружаем данные счетчика
             }
 
             is Resource.Error -> {
                 state = state.copy(
                     isLoading = false,
-                    error = Text.RawString(result.exception.message ?: "Ошибка удаления счетчика")
+                    error = Text.RawString(
+                        result.exception.message ?: "Ошибка сохранения показаний"
+                    )
                 )
             }
         }

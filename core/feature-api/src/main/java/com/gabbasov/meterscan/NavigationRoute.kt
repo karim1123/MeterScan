@@ -8,6 +8,5 @@ enum class NavigationRoute(val route: String) {
     METER_DETAILS("meter_details"),
     WORK("work"),
     METER_SCAN("meter_scan"),
-    ADD_READING("add_reading"),
     SETTINGS("settings"),
 }

@@ -31,5 +31,5 @@ val metersFeatureModule = module {
     singleOf(::MetersRepositoryImpl) bind MetersRepository::class
     singleOf(::MetersNavigation) bind MetersFeatureApi::class
     viewModel { MetersListViewModel(get()) }
-    viewModel { MeterDetailViewModel(get()) }
+    viewModel { MeterDetailViewModel(get(), get()) }
 }

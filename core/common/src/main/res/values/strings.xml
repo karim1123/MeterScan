@@ -11,4 +11,13 @@
     <string name="no_meters_available">Нет доступных счетчиков</string>
     <string name="clear_search">Очистить поиск</string>
     <string name="search">Поиск</string>
+    <string name="add_reading_title">Ввод показаний</string>
+    <string name="add_reading_label">Показания</string>
+    <string name="add_reading_last_reading">Последние показания: %1$s</string>
+    <string name="add_reading_save">Сохранить</string>
+    <string name="add_reading_decline">Отмена</string>
+    <string name="lower_value_tile">Внимание</string>
+    <string name="lower_value_body">Введенное значение (%1$s) меньше последнего показания (%2$s). Вы уверены?</string>
+    <string name="lower_value_save">Сохранить</string>
+    <string name="lower_value_decline">Изменить</string>
 </resources>

@@ -18,19 +18,32 @@ internal class MeterDetailCoordinator(
 
     fun onAddReading() {
         viewModel.execute(MeterDetailAction.AddReading)
-        state.value.meter?.id?.let { meterId ->
-            navController.navigate("${NavigationRoute.ADD_READING}/$meterId")
-        }
-    }
-
-    fun onDeleteMeter() {
-        viewModel.execute(MeterDetailAction.DeleteMeter)
-        navController.popBackStack()
     }
 
     fun onNavigateBack() {
         viewModel.execute(MeterDetailAction.NavigateBack)
         navController.popBackStack()
+    }
+
+    fun onSaveReading(reading: String) {
+        viewModel.execute(MeterDetailAction.SaveReading(reading))
+    }
+
+    fun onConfirmLowerValue() {
+        viewModel.execute(MeterDetailAction.ConfirmLowerValue)
+    }
+
+    fun onDismissReadingDialog() {
+        viewModel.execute(MeterDetailAction.DismissReadingDialog)
+    }
+
+    fun onDismissLowerValueWarning() {
+        viewModel.execute(MeterDetailAction.DismissLowerValueWarning)
+    }
+
+    fun onNavigateToScan(meterId: String) {
+        navController.navigate("${NavigationRoute.METER_SCAN.route}/$meterId")
+        viewModel.execute(MeterDetailAction.NavigationHandled)
     }
 }
 
