@@ -28,25 +28,17 @@ class MeterScanCoordinator(
         viewModel.execute(MeterScanAction.UpdateReading(reading))
     }
 
-    fun onSaveReading() {
+    fun onSaveReading(goBack: Boolean = false) {
         val state = state.value
-        viewModel.execute(MeterScanAction.SaveReading(state.meterReading))
+        viewModel.execute(MeterScanAction.SaveReading(state.meterReading, goBack))
     }
 
     fun onRetryScanning() {
         viewModel.execute(MeterScanAction.RetryScanning)
     }
 
-    fun onEnterManually() {
-        viewModel.execute(MeterScanAction.EnterManually)
-    }
-
     fun onDismissBottomSheet() {
         viewModel.execute(MeterScanAction.DismissBottomSheet)
-    }
-
-    fun onDismissErrorDialog() {
-        viewModel.execute(MeterScanAction.DismissErrorDialog)
     }
 
     fun getConfidenceThreshold() = viewModel.getСonfidenceThreshold()
@@ -79,6 +71,26 @@ class MeterScanCoordinator(
 
     fun navigateToMetersList() {
         navController.navigate(NavigationRoute.METERS_LIST.route)
+    }
+
+    fun setGoBackAfterSave(goBack: Boolean) {
+        viewModel.execute(MeterScanAction.SetGoBackAfterSave(goBack))
+    }
+
+    fun onConfirmLowerValue() {
+        viewModel.execute(MeterScanAction.ConfirmLowerValue)
+    }
+
+    fun onDismissLowerValueWarning() {
+        viewModel.execute(MeterScanAction.DismissLowerValueWarning)
+    }
+
+    fun onNavigationHandled() {
+        viewModel.execute(MeterScanAction.NavigationHandled)
+    }
+
+    fun navigateBack() {
+        navController.popBackStack()
     }
 }
 

@@ -9,6 +9,6 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val mainModule = module {
-    viewModel { MainActivityViewModel(get(), get(), get(), get(), get(), get()) }
+    viewModel { MainActivityViewModel(get(), get(), get(), get(), get(), get(), get()) }
     singleOf(::ScanSettingsRepositoryImpl) bind ScanSettingsRepository::class
 }

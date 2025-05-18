@@ -59,9 +59,13 @@ class MeterScanNavigation : MeterScanFeatureApi {
 
         // Маршрут с параметром meterId
         navGraphBuilder.composable(
-            route = "${meterScanRoute()}/{meterId}",
+            route = "${meterScanRoute()}/{meterId}?goBack={goBack}",
             arguments = listOf(
-                navArgument("meterId") { type = NavType.StringType }
+                navArgument("meterId") { type = NavType.StringType },
+                navArgument("goBack") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
             ),
             enterTransition = {
                 slideInHorizontally(
@@ -89,9 +93,11 @@ class MeterScanNavigation : MeterScanFeatureApi {
             }
         ) { backStackEntry ->
             val meterId = backStackEntry.arguments?.getString("meterId")
+            val goBack = backStackEntry.arguments?.getBoolean("goBack") ?: false
             MeterScanScreenRoute(
                 coordinator = rememberMeterScanCoordinator(navController = navController),
-                meterId = meterId
+                meterId = meterId,
+                goBackAfterSave = goBack
             )
         }
     }

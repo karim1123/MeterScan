@@ -62,7 +62,8 @@ class MeterScanViewModel(
         when (action) {
             is MeterScanAction.DetectDigits -> processDetectedDigits(action.digitBoxes)
             is MeterScanAction.UpdateReading -> updateMeterReading(action.reading)
-            is MeterScanAction.SaveReading -> saveReading(action.reading)
+            is MeterScanAction.SaveReading -> checkAndSaveReading(action.reading, action.goBack)
+            is MeterScanAction.SetGoBackAfterSave -> state = state.copy(goBackAfterSave = action.goBack)
             is MeterScanAction.RetryScanning -> retryScanning()
             is MeterScanAction.EnterManually -> showEditDialog()
             is MeterScanAction.DismissBottomSheet -> dismissBottomSheet()
@@ -70,11 +71,76 @@ class MeterScanViewModel(
             is MeterScanAction.ToggleFlashlight -> toggleCamera()
             is MeterScanAction.RotateCamera -> rotateCamera()
             is MeterScanAction.TogglePause -> togglePause()
+            is MeterScanAction.ConfirmLowerValue -> forceAddReading()
+            is MeterScanAction.DismissLowerValueWarning -> state = state.copy(showLowerValueWarning = false)
+            is MeterScanAction.NavigationHandled -> state = state.copy(navigateBack = false)
             MeterScanAction.HideMeterSelection -> hideMeterSelection()
             is MeterScanAction.LoadMeter -> loadMeter(action.meterId)
             MeterScanAction.NavigateToMetersList -> Unit
             is MeterScanAction.SelectMeter -> selectMeter(action.meter)
             MeterScanAction.ShowMeterSelection -> showMeterSelection()
+        }
+    }
+
+    private fun checkAndSaveReading(reading: String, goBack: Boolean) {
+        val readingValue = reading.toDoubleOrNull() ?: return
+        val meter = state.selectedMeter ?: return
+
+        val lastReading = meter.readings.maxByOrNull { it.date }?.value ?: 0.0
+
+        if (readingValue < lastReading) {
+            state = state.copy(
+                showLowerValueWarning = true,
+                newReading = reading,
+                goBackAfterSave = goBack
+            )
+        } else {
+            saveReading(readingValue, goBack)
+        }
+    }
+
+    private fun forceAddReading() {
+        val readingValue = state.newReading.toDoubleOrNull() ?: return
+        saveReading(readingValue, state.goBackAfterSave)
+        state = state.copy(showLowerValueWarning = false)
+    }
+
+    private fun saveReading(reading: Double, goBack: Boolean) = viewModelScope.launch {
+        val meter = state.selectedMeter ?: return@launch
+
+        if (meter.id.isBlank()) {
+            state = state.copy(
+                error = Text.RawString("ID счетчика не может быть пустым")
+            )
+            return@launch
+        }
+
+        state = state.copy(isLoading = true)
+
+        when (val result = metersRepository.addReading(meter.id, reading)) {
+            is Resource.Success -> {
+                state = state.copy(
+                    showSuccessMessage = true,
+                    showBottomSheet = false,
+                    isLoading = false
+                )
+
+                if (goBack) {
+                    delay(1000) // Небольшая задержка для отображения сообщения
+                    state = state.copy(
+                        navigateBack = true
+                    )
+                } else {
+                    delay(2000)
+                    state = state.copy(showSuccessMessage = false)
+                }
+            }
+            is Resource.Error -> {
+                state = state.copy(
+                    isLoading = false,
+                    error = Text.RawString("Ошибка сохранения показаний: ${result.exception.message}")
+                )
+            }
         }
     }
 
@@ -114,42 +180,6 @@ class MeterScanViewModel(
 
     private fun hideMeterSelection() {
         state = state.copy(showMeterSelection = false)
-    }
-
-    private fun saveReading(reading: String) = viewModelScope.launch {
-        val meter = state.selectedMeter ?: return@launch
-
-        if (reading.isBlank()) {
-            state = state.copy(
-                error = Text.RawString("Показания не могут быть пустыми")
-            )
-            return@launch
-        }
-
-        val readingValue = reading.toDoubleOrNull()
-        if (readingValue == null) {
-            state = state.copy(
-                error = Text.RawString("Неверный формат показаний")
-            )
-            return@launch
-        }
-
-        when (val result = metersRepository.addReading(meter.id, readingValue)) {
-            is Resource.Success -> {
-                state = state.copy(
-                    showSuccessMessage = true,
-                    showBottomSheet = false
-                )
-
-                delay(2000)
-                state = state.copy(showSuccessMessage = false)
-            }
-            is Resource.Error -> {
-                state = state.copy(
-                    error = Text.RawString("Ошибка сохранения показаний: ${result.exception.message}")
-                )
-            }
-        }
     }
 
     private fun togglePause() {

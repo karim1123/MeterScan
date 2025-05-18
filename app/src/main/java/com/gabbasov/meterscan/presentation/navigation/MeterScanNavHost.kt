@@ -47,5 +47,9 @@ fun MeterScanNavHost(
             navController = navController,
             featureApi = viewModel.mainScreenApi,
         )
+        register(
+            navController = navController,
+            featureApi = viewModel.meterScanFeatureApi
+        )
     }
 }

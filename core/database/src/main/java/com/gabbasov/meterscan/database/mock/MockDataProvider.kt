@@ -104,11 +104,11 @@ class MockDataProvider(private val database: MeterScanDatabase) {
         val startDate = LocalDate.now().minusYears(5)
         val readings = mutableListOf<ReadingEntity>()
 
-        // Начальное значение
+        // Начальное значение (округляем до целых)
         var currentValue = when (type) {
-            MeterType.ELECTRICITY -> Random.nextDouble(1000.0, 10000.0)
-            MeterType.WATER -> Random.nextDouble(50.0, 500.0)
-            MeterType.GAS -> Random.nextDouble(100.0, 1000.0)
+            MeterType.ELECTRICITY -> Random.nextDouble(1000.0, 10000.0).roundToInt().toDouble()
+            MeterType.WATER -> Random.nextDouble(50.0, 500.0).roundToInt().toDouble()
+            MeterType.GAS -> Random.nextDouble(100.0, 1000.0).roundToInt().toDouble()
         }
 
         // Создаем показания за 5 лет (60 месяцев)
@@ -117,32 +117,27 @@ class MockDataProvider(private val database: MeterScanDatabase) {
             val month = date.monthValue
 
             // Увеличиваем значение в зависимости от типа счетчика
-            currentValue += when (type) {
-                MeterType.ELECTRICITY -> Random.nextDouble(100.0, 300.0) // 100-300 кВтч в месяц
-                MeterType.WATER -> Random.nextDouble(0.0, 30.0) // 0-30 м³ в месяц
+            val increment = when (type) {
+                MeterType.ELECTRICITY -> Random.nextDouble(100.0, 300.0)
+                MeterType.WATER -> Random.nextDouble(0.0, 30.0)
                 MeterType.GAS -> {
-                    // Сезонность для газа: больше зимой (октябрь-март), меньше летом (апрель-сентябрь)
                     if (month in 10..12 || month in 1..3) {
-                        Random.nextDouble(300.0, 1200.0) // Зимой высокое потребление
+                        Random.nextDouble(300.0, 1200.0)
                     } else {
-                        Random.nextDouble(0.0, 300.0) // Летом низкое потребление
+                        Random.nextDouble(0.0, 300.0)
                     }
                 }
             }
 
-            // Округляем значения
-            val roundedValue = when (type) {
-                MeterType.ELECTRICITY -> (currentValue * 10).roundToInt() / 10.0
-                MeterType.WATER -> (currentValue * 100).roundToInt() / 100.0
-                MeterType.GAS -> (currentValue * 10).roundToInt() / 10.0
-            }
+            // Добавляем приращение и округляем до целого числа
+            currentValue = (currentValue + increment).roundToInt().toDouble()
 
             readings.add(
                 ReadingEntity(
                     id = UUID.randomUUID().toString(),
                     meterId = meterId,
                     date = date,
-                    value = roundedValue
+                    value = currentValue
                 )
             )
         }

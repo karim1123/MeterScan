@@ -43,9 +43,10 @@ import com.gabbasov.meterscan.scan.domain.DigitBox
 import com.gabbasov.meterscan.scan.presentation.components.CameraView
 import com.gabbasov.meterscan.scan.presentation.components.DigitOverlayView
 import com.gabbasov.meterscan.scan.presentation.components.FlashlightControl
-import com.gabbasov.meterscan.scan.presentation.components.bottomsheet.MeterReadingBottomSheet
 import com.gabbasov.meterscan.scan.presentation.components.RecognitionProgressIndicator
+import com.gabbasov.meterscan.scan.presentation.components.bottomsheet.MeterReadingBottomSheet
 import com.gabbasov.meterscan.scan.presentation.dialog.MeterSelectionDialog
+import com.gabbasov.meterscan.ui.dialog.LowerValueWarningDialog
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -53,13 +54,21 @@ import com.google.accompanist.permissions.rememberPermissionState
 @Composable
 internal fun MeterScanScreenRoute(
     coordinator: MeterScanCoordinator,
-    meterId: String? = null
+    meterId: String? = null,
+    goBackAfterSave: Boolean = false
 ) {
     val uiState by coordinator.state.collectAsStateWithLifecycle()
 
-    // Загружаем счетчик при запуске экрана, если передан ID
-    LaunchedEffect(meterId) {
+    LaunchedEffect(meterId, goBackAfterSave) {
+        coordinator.setGoBackAfterSave(goBackAfterSave)
         coordinator.loadMeter(meterId)
+    }
+
+    LaunchedEffect(uiState.navigateBack) {
+        if (uiState.navigateBack) {
+            coordinator.onNavigationHandled()
+            coordinator.navigateBack()
+        }
     }
 
     MeterScanTheme {
@@ -67,7 +76,7 @@ internal fun MeterScanScreenRoute(
             state = uiState,
             onDigitsDetected = coordinator::onDigitsDetected,
             onReadingUpdated = coordinator::onReadingUpdated,
-            onSaveReading = coordinator::onSaveReading,
+            onSaveReading = { coordinator.onSaveReading(uiState.goBackAfterSave) },
             onRetryScanning = coordinator::onRetryScanning,
             onDismissBottomSheet = coordinator::onDismissBottomSheet,
             confidenceThreshold = coordinator.getConfidenceThreshold(),
@@ -77,7 +86,9 @@ internal fun MeterScanScreenRoute(
             onTogglePause = coordinator::onTogglePause,
             onShowMeterSelection = coordinator::onShowMeterSelection,
             onHideMeterSelection = coordinator::onHideMeterSelection,
-            navigateToMetersList = coordinator::navigateToMetersList
+            navigateToMetersList = coordinator::navigateToMetersList,
+            onConfirmLowerValue = coordinator::onConfirmLowerValue,
+            onDismissLowerValueWarning = coordinator::onDismissLowerValueWarning
         )
     }
 }
@@ -88,7 +99,7 @@ internal fun MeterScanScreen(
     state: MeterScanState,
     onDigitsDetected: (List<DigitBox>) -> Unit,
     onReadingUpdated: (String) -> Unit,
-    onSaveReading: () -> Unit,
+    onSaveReading: (String) -> Unit,
     onRetryScanning: () -> Unit,
     onDismissBottomSheet: () -> Unit,
     confidenceThreshold: Float,
@@ -98,7 +109,9 @@ internal fun MeterScanScreen(
     onTogglePause: () -> Unit,
     onShowMeterSelection: () -> Unit,
     onHideMeterSelection: () -> Unit,
-    navigateToMetersList: () -> Unit
+    navigateToMetersList: () -> Unit,
+    onConfirmLowerValue: () -> Unit,
+    onDismissLowerValueWarning: () -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -131,6 +144,17 @@ internal fun MeterScanScreen(
         MeterSelectionDialog(
             onDismiss = onHideMeterSelection,
             navigateToMetersList = navigateToMetersList
+        )
+    }
+
+    // Показываем диалог предупреждения о меньшем значении показаний, если нужно
+    if (state.showLowerValueWarning) {
+        LowerValueWarningDialog(
+            reading = state.newReading,
+            lastReading = state.selectedMeter?.readings?.maxByOrNull { it.date }?.value ?: 0.0,
+            onConfirm = onConfirmLowerValue,
+            onEdit = onDismissLowerValueWarning,
+            onDismiss = onDismissLowerValueWarning
         )
     }
 
@@ -189,10 +213,10 @@ internal fun MeterScanScreen(
                     reading = state.meterReading,
                     isScanning = !state.isPaused,
                     onReadingChange = onReadingUpdated,
-                    onSave = onSaveReading,
+                    onSave = { onSaveReading(state.meterReading) },
                     onRetryScanning = onRetryScanning,
                     onDismissBottomSheet = onDismissBottomSheet,
-                    defaultDigitCount = state.meterReading.length,
+                    defaultDigitCount = 4,
                     selectedMeter = state.selectedMeter,
                     onSelectMeter = onShowMeterSelection
                 )

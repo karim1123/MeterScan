@@ -109,12 +109,24 @@ class MetersRepositoryImpl(
             }
 
             val meter = (meterResource as Resource.Success).data
+            val now = LocalDate.now()
+            val currentMonth = now.month
+            val currentYear = now.year
+
+            // Удаляем показания за текущий месяц
+            val filteredReadings = meter.readings.filter { reading ->
+                reading.date.month != currentMonth || reading.date.year != currentYear
+            }
+
+            // Создаем новое показание
             val newReading = MeterReading(
-                date = LocalDate.now(),
+                date = now,
                 value = reading
             )
+
+            // Объединяем отфильтрованные показания с новым
             val updatedMeter = meter.copy(
-                readings = meter.readings + newReading
+                readings = filteredReadings + newReading
             )
 
             updateMeter(updatedMeter)

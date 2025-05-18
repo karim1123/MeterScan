@@ -9,6 +9,8 @@ import com.gabbasov.meterscan.features.SignInFeatureApi
 import com.gabbasov.meterscan.features.SignUpFeatureApi
 import com.gabbasov.meterscan.base.Resource
 import com.gabbasov.meterscan.database.mock.MockDataProvider
+import com.gabbasov.meterscan.features.MeterScanFeatureApi
+import com.gabbasov.meterscan.features.SettingsFeatureApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -22,6 +24,7 @@ class MainActivityViewModel(
     val signInApi: SignInFeatureApi,
     val metersFeatureApi: MetersFeatureApi,
     val mainScreenApi: MainScreenFeatureApi,
+    val meterScanFeatureApi: MeterScanFeatureApi,
 ) : ViewModel() {
 
     val isAuthorized = authRepository.getCurrentUser()

@@ -43,7 +43,7 @@ internal class MeterDetailCoordinator(
     }
 
     fun onNavigateToScan(meterId: String) {
-        NavigationHolder.rootNavController?.navigate("${NavigationRoute.METER_SCAN.route}/$meterId")
+        NavigationHolder.rootNavController?.navigate("${NavigationRoute.METER_SCAN.route}/$meterId?goBack=true")
         viewModel.execute(MeterDetailAction.NavigationHandled)
     }
 }
