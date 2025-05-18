@@ -59,12 +59,10 @@ fun ReadingListItem(
 
         }
 
-        if (consumption > 0) {
-            Text(
-                text = "${consumption.roundToInt()} ${getMeterUnits(meterType)}",
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
+        Text(
+            text = "${consumption.roundToInt()} ${getMeterUnits(meterType)}",
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 
