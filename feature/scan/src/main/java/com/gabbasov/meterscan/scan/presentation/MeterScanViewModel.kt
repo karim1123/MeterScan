@@ -196,11 +196,29 @@ class MeterScanViewModel(
         }
     }
 
-    private fun selectMeter(meter: Meter) {
+    private fun selectMeter(meter: Meter) = viewModelScope.launch {
         state = state.copy(
-            selectedMeter = meter,
-            showMeterSelection = false
+            showMeterSelection = false,
+            isLoading = true
         )
+
+        metersRepository.getMeterById(meter.id).collect { result ->
+            state = when (result) {
+                is Resource.Success -> {
+                    state.copy(
+                        selectedMeter = result.data,
+                        isLoading = false
+                    )
+                }
+
+                is Resource.Error -> {
+                    state.copy(
+                        selectedMeter = meter,
+                        isLoading = false
+                    )
+                }
+            }
+        }
     }
 
     private fun showMeterSelection() {
