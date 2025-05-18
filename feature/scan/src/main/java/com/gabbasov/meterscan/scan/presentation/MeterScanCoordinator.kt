@@ -61,10 +61,6 @@ class MeterScanCoordinator(
         viewModel.execute(MeterScanAction.SelectMeter(meter))
     }
 
-    fun onShowMeterSelection() {
-        viewModel.execute(MeterScanAction.ShowMeterSelection)
-    }
-
     fun onHideMeterSelection() {
         viewModel.execute(MeterScanAction.HideMeterSelection)
     }
@@ -91,6 +87,14 @@ class MeterScanCoordinator(
 
     fun navigateBack() {
         navController.popBackStack()
+    }
+
+    fun showMeterSelectionScreen() {
+        viewModel.execute(MeterScanAction.ShowMeterSelectionScreen)
+    }
+
+    fun hideMeterSelectionScreen() {
+        viewModel.execute(MeterScanAction.HideMeterSelectionScreen)
     }
 }
 

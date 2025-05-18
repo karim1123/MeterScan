@@ -79,6 +79,35 @@ class MeterScanViewModel(
             MeterScanAction.NavigateToMetersList -> Unit
             is MeterScanAction.SelectMeter -> selectMeter(action.meter)
             MeterScanAction.ShowMeterSelection -> showMeterSelection()
+            is MeterScanAction.LoadAllMeters -> loadAllMeters()
+            is MeterScanAction.ShowMeterSelectionScreen -> {
+                state = state.copy(showMeterSelectionScreen = true)
+                loadAllMeters()
+            }
+            is MeterScanAction.HideMeterSelectionScreen -> {
+                state = state.copy(showMeterSelectionScreen = false)
+            }
+        }
+    }
+
+    private fun loadAllMeters() = viewModelScope.launch {
+        state = state.copy(isLoading = true)
+
+        metersRepository.getAllMeters().collect { result ->
+            when (result) {
+                is Resource.Success -> {
+                    state = state.copy(
+                        allMeters = result.data,
+                        isLoading = false
+                    )
+                }
+                is Resource.Error -> {
+                    state = state.copy(
+                        error = Text.RawString("Ошибка загрузки счетчиков: ${result.exception.message}"),
+                        isLoading = false
+                    )
+                }
+            }
         }
     }
 

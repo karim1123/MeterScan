@@ -28,6 +28,8 @@ data class MeterScanState(
     val isPaused: Boolean = true,
     val selectedMeter: Meter? = null,
     val showMeterSelection: Boolean = false,
+    val allMeters: List<Meter> = emptyList(),
+    val showMeterSelectionScreen: Boolean = false,
     override val isLoading: Boolean = false,
     override val error: com.gabbasov.meterscan.ui.Text? = null
 ) : BaseState()
@@ -52,4 +54,7 @@ sealed interface MeterScanAction : BaseAction {
     data object ShowMeterSelection : MeterScanAction
     data object HideMeterSelection : MeterScanAction
     data object NavigateToMetersList : MeterScanAction
+    data object LoadAllMeters : MeterScanAction
+    data object ShowMeterSelectionScreen : MeterScanAction
+    data object HideMeterSelectionScreen : MeterScanAction
 }

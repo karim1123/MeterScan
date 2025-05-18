@@ -45,6 +45,7 @@ import com.gabbasov.meterscan.scan.presentation.components.DigitOverlayView
 import com.gabbasov.meterscan.scan.presentation.components.FlashlightControl
 import com.gabbasov.meterscan.scan.presentation.components.RecognitionProgressIndicator
 import com.gabbasov.meterscan.scan.presentation.components.bottomsheet.MeterReadingBottomSheet
+import com.gabbasov.meterscan.scan.presentation.components.meterselection.MeterSelectionScreen
 import com.gabbasov.meterscan.scan.presentation.dialog.MeterSelectionDialog
 import com.gabbasov.meterscan.ui.dialog.LowerValueWarningDialog
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -72,24 +73,35 @@ internal fun MeterScanScreenRoute(
     }
 
     MeterScanTheme {
-        MeterScanScreen(
-            state = uiState,
-            onDigitsDetected = coordinator::onDigitsDetected,
-            onReadingUpdated = coordinator::onReadingUpdated,
-            onSaveReading = { coordinator.onSaveReading(uiState.goBackAfterSave) },
-            onRetryScanning = coordinator::onRetryScanning,
-            onDismissBottomSheet = coordinator::onDismissBottomSheet,
-            confidenceThreshold = coordinator.getConfidenceThreshold(),
-            highConfidenceThreshold = coordinator.getHighConfidenceThreshold(),
-            onToggleFlashlight = coordinator::onToggleFlashlight,
-            onRotateCamera = coordinator::onRotateCamera,
-            onTogglePause = coordinator::onTogglePause,
-            onShowMeterSelection = coordinator::onShowMeterSelection,
-            onHideMeterSelection = coordinator::onHideMeterSelection,
-            navigateToMetersList = coordinator::navigateToMetersList,
-            onConfirmLowerValue = coordinator::onConfirmLowerValue,
-            onDismissLowerValueWarning = coordinator::onDismissLowerValueWarning
-        )
+        if (uiState.showMeterSelectionScreen) {
+            MeterSelectionScreen(
+                meters = uiState.allMeters,
+                onMeterSelected = { meter ->
+                    coordinator.onSelectMeter(meter)
+                    coordinator.hideMeterSelectionScreen()
+                },
+                onNavigateBack = coordinator::hideMeterSelectionScreen
+            )
+        } else {
+            MeterScanScreen(
+                state = uiState,
+                onDigitsDetected = coordinator::onDigitsDetected,
+                onReadingUpdated = coordinator::onReadingUpdated,
+                onSaveReading = { coordinator.onSaveReading(uiState.goBackAfterSave) },
+                onRetryScanning = coordinator::onRetryScanning,
+                onDismissBottomSheet = coordinator::onDismissBottomSheet,
+                confidenceThreshold = coordinator.getConfidenceThreshold(),
+                highConfidenceThreshold = coordinator.getHighConfidenceThreshold(),
+                onToggleFlashlight = coordinator::onToggleFlashlight,
+                onRotateCamera = coordinator::onRotateCamera,
+                onTogglePause = coordinator::onTogglePause,
+                onShowMeterSelection = coordinator::showMeterSelectionScreen,
+                onHideMeterSelection = coordinator::onHideMeterSelection,
+                navigateToMetersList = coordinator::navigateToMetersList,
+                onConfirmLowerValue = coordinator::onConfirmLowerValue,
+                onDismissLowerValueWarning = coordinator::onDismissLowerValueWarning
+            )
+        }
     }
 }
 
@@ -164,7 +176,8 @@ internal fun MeterScanScreen(
                 title = { Text(stringResource(R.string.scan_meter_reading)) },
                 actions = {
                     IconButton(onClick = onTogglePause) {
-                        val imageRes = if (state.isPaused) R.drawable.ic_play else R.drawable.ic_pause
+                        val imageRes =
+                            if (state.isPaused) R.drawable.ic_play else R.drawable.ic_pause
                         Icon(
                             imageVector = ImageVector.vectorResource(id = imageRes),
                             contentDescription = stringResource(
@@ -191,7 +204,8 @@ internal fun MeterScanScreen(
                             }
                         }
                     ) {
-                        val iconRes = if (state.flashlightEnabled) R.drawable.flash_on else R.drawable.flash_off
+                        val iconRes =
+                            if (state.flashlightEnabled) R.drawable.flash_on else R.drawable.flash_off
                         Icon(
                             imageVector = ImageVector.vectorResource(id = iconRes),
                             contentDescription = if (state.flashlightEnabled)
@@ -272,7 +286,9 @@ internal fun MeterScanScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
                         textAlign = TextAlign.Center,
                         text = stringResource(R.string.camera_permission_required),
                         style = MaterialTheme.typography.bodyLarge
