@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,16 +29,20 @@ import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.MapObject
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.log2
 
 private const val ANIMATION_DURATION = 0.3f
 private const val MIN_ZOOM = 10f
 private const val MAX_ZOOM = 18f
 private const val BASE_ZOOM = 15f
+private const val MIN_TAP_INTERVAL = 500L // Минимальный интервал между нажатиями в миллисекундах
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -51,12 +56,67 @@ fun WorkMapTab(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
-    var selectedMeter by remember { mutableStateOf<Meter?>(null) }
+    // Используем rememberSaveable для сохранения состояния при переключении экранов
+    var selectedMeter by rememberSaveable { mutableStateOf<Meter?>(null) }
     var mapView by remember { mutableStateOf<MapView?>(null) }
     var map by remember { mutableStateOf<Map?>(null) }
     var previousZoom by remember { mutableStateOf(15.0f) }
     var isMapInitialized by remember { mutableStateOf(false) }
+    var lastSelectedMeterId by rememberSaveable { mutableStateOf<String?>(null) }
+
+    // Новые переменные для улучшения обработки нажатий
+    var lastTapTime by remember { mutableStateOf(0L) }
+    var isBottomSheetClosing by remember { mutableStateOf(false) }
+
+    // Глобальный слушатель для маркеров
+    val mapMarkerTapListener = remember {
+        object : MapObjectTapListener {
+            override fun onMapObjectTap(mapObject: MapObject, point: Point): Boolean {
+                val meterId = mapObject.userData as? String
+                Timber.d("WorkMapTab: Маркер нажат, userData: $meterId")
+
+                if (meterId == null) return false
+
+                val meter = meters.find { it.id == meterId }
+                if (meter == null) {
+                    Timber.d("WorkMapTab: Счетчик с ID $meterId не найден")
+                    return false
+                }
+
+                Timber.d("WorkMapTab: Метка нажата для счетчика ${meter.number} в точке $point")
+
+                // Проверяем, прошло ли достаточно времени с последнего нажатия и не закрывается ли BottomSheet
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastTapTime > MIN_TAP_INTERVAL && !isBottomSheetClosing) {
+                    lastTapTime = currentTime
+
+                    // Проверяем, не тот же самый маркер
+                    if (selectedMeter?.id != meter.id) {
+                        Timber.d("WorkMapTab: Устанавливаем новый выбранный счетчик ${meter.number}")
+                        selectedMeter = meter
+                        lastSelectedMeterId = meter.id
+                    } else {
+                        Timber.d("WorkMapTab: Маркер уже выбран, счетчик: ${meter.number}")
+                    }
+                } else {
+                    Timber.d("WorkMapTab: Игнорируем нажатие (интервал: ${currentTime - lastTapTime}ms, isClosing: $isBottomSheetClosing)")
+                }
+
+                return true
+            }
+        }
+    }
+
+    Timber.d("WorkMapTab: Composition с ${meters.size} счетчиками, местоположение: $userLocation")
+
+    LaunchedEffect(lastSelectedMeterId) {
+        if (lastSelectedMeterId != null && selectedMeter == null && !isBottomSheetClosing) {
+            Timber.d("WorkMapTab: Восстановление выбранного счетчика с ID $lastSelectedMeterId")
+            selectedMeter = meters.find { it.id == lastSelectedMeterId }
+        }
+    }
 
     val locationPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -64,12 +124,14 @@ fun WorkMapTab(
 
     LaunchedEffect(locationPermissionState.status.isGranted) {
         if (locationPermissionState.status.isGranted && userLocation == null) {
+            Timber.d("WorkMapTab: Запрос местоположения")
             onRequestLocation()
         }
     }
 
     LaunchedEffect(mapView, meters, userLocation) {
         if (mapView != null && !isMapInitialized && meters.isNotEmpty()) {
+            Timber.d("WorkMapTab: Начальная настройка карты")
             delay(500) // Задержка 500мс для инициализации карты
 
             val visiblePoints = mutableListOf<Point>()
@@ -118,6 +180,7 @@ fun WorkMapTab(
                 // Берем минимальный зум из двух направлений для отображения всех точек
                 val optimalZoom = minOf(zoomLat, zoomLon).toFloat().coerceIn(MIN_ZOOM, MAX_ZOOM)
 
+                Timber.d("WorkMapTab: Устанавливаем камеру карты на $centerLat, $centerLon с зумом $optimalZoom")
                 // Перемещаем камеру на оптимальный зум
                 map?.move(
                     CameraPosition(
@@ -131,6 +194,7 @@ fun WorkMapTab(
                 )
 
                 isMapInitialized = true
+                Timber.d("WorkMapTab: Карта инициализирована")
             }
         }
     }
@@ -139,10 +203,17 @@ fun WorkMapTab(
         // Отображение карты
         AndroidView(
             factory = { ctx ->
+                Timber.d("WorkMapTab: Создание MapView")
                 MapKitFactory.getInstance().onStart()
                 MapView(ctx).apply {
                     mapView = this
                     map = this.mapWindow.map
+                    Timber.d("WorkMapTab: MapView и Map инициализированы")
+
+                    // Убедимся, что жесты включены
+                    this.mapWindow.map.isZoomGesturesEnabled = true
+                    this.mapWindow.map.isRotateGesturesEnabled = true
+                    this.mapWindow.map.isScrollGesturesEnabled = true
 
                     // Устанавливаем начальное положение камеры
                     userLocation?.let { (latitude, longitude) ->
@@ -156,16 +227,25 @@ fun WorkMapTab(
                         )
                     }
 
-                    // Правильная сигнатура с 4 параметрами
                     this.mapWindow.map.addCameraListener { _, cameraPosition, _, finished ->
                         if (finished) {
                             previousZoom = cameraPosition.zoom
+                            Timber.d("WorkMapTab: Изменен зум карты на $previousZoom")
                         }
                     }
                 }
             },
             update = { view ->
-                // Удаление предыдущих объектов с карты
+                Timber.d("WorkMapTab: Обновление MapView с ${meters.size} счетчиками")
+
+                // Сохраняем ссылку на map для использования в других местах
+                map = view.mapWindow.map
+
+                // Включаем все жесты при обновлении
+                view.mapWindow.map.isZoomGesturesEnabled = true
+                view.mapWindow.map.isRotateGesturesEnabled = true
+                view.mapWindow.map.isScrollGesturesEnabled = true
+
                 view.mapWindow.map.mapObjects.clear()
 
                 // Добавление маркеров счетчиков на карту
@@ -182,10 +262,10 @@ fun WorkMapTab(
                             // Создаем bitmap
                             val bitmap = MapIconUtils.createMeterIconBitmap(context, iconResId, meter.type)
 
-                            // Масштабирование через IconStyle
+                            // Увеличенный масштаб и z-index для лучшего перехвата нажатий
                             val iconStyle = IconStyle().apply {
-                                this.scale = 0.8f
-                                this.zIndex = 0.5f
+                                this.scale = 1.0f  // Увеличенный масштаб
+                                this.zIndex = 10.0f // Более высокий z-index
                             }
 
                             val placemarkObject = view.mapWindow.map.mapObjects.addPlacemark(
@@ -194,14 +274,18 @@ fun WorkMapTab(
                                 iconStyle
                             )
 
-                            placemarkObject.addTapListener(MapObjectTapListener { _, _ ->
-                                selectedMeter = meter
-                                true
-                            })
+                            // Сохраняем ID счетчика в userData
+                            placemarkObject.userData = meter.id
+
+                            // Используем один глобальный слушатель вместо создания нового при каждом обновлении
+                            placemarkObject.addTapListener(mapMarkerTapListener)
+
+                            Timber.d("WorkMapTab: Добавлен маркер для счетчика ${meter.number} с ID ${meter.id}")
                         }
                     }
                 }
 
+                // Добавление маркера местоположения пользователя
                 userLocation?.let { (latitude, longitude) ->
                     val locationBitmap = MapIconUtils.createLocationMarkerBitmap(context)
                     val zoom = view.mapWindow.map.cameraPosition.zoom
@@ -217,9 +301,11 @@ fun WorkMapTab(
                         ImageProvider.fromBitmap(locationBitmap),
                         locationStyle
                     )
+                    Timber.d("WorkMapTab: Добавлен маркер местоположения пользователя")
                 }
             },
             onRelease = {
+                Timber.d("WorkMapTab: Освобождение MapView")
                 mapView?.onStop()
                 MapKitFactory.getInstance().onStop()
             },
@@ -229,6 +315,7 @@ fun WorkMapTab(
         if (locationPermissionState.status.isGranted) {
             FloatingActionButton(
                 onClick = {
+                    Timber.d("WorkMapTab: Нажата кнопка 'Мое местоположение'")
                     userLocation?.let { (latitude, longitude) ->
                         map?.move(
                             CameraPosition(
@@ -276,21 +363,37 @@ fun WorkMapTab(
 
         // Bottom Sheet для выбранного счетчика
         if (selectedMeter != null) {
+            Timber.d("WorkMapTab: Показываем BottomSheet для счетчика ${selectedMeter?.number}")
             MapBottomSheet(
                 meter = selectedMeter!!,
-                onDismiss = { selectedMeter = null },
+                onDismiss = {
+                    Timber.d("WorkMapTab: BottomSheet закрыт")
+                    isBottomSheetClosing = true
+                    selectedMeter = null
+
+                    // Добавляем задержку перед возможностью повторного открытия
+                    coroutineScope.launch {
+                        delay(300) // 300 мс задержка
+                        isBottomSheetClosing = false
+                        Timber.d("WorkMapTab: Готов к приему новых нажатий")
+                    }
+                },
                 onBuildRoute = {
+                    Timber.d("WorkMapTab: Построение маршрута для счетчика ${selectedMeter?.number}")
                     selectedMeter?.let { meter ->
                         buildRoute(context, meter, userLocation, navigatorType)
                         onBuildRoute(meter)
                     }
                 },
                 onTakeReading = {
+                    Timber.d("WorkMapTab: Снятие показаний для счетчика ${selectedMeter?.number}")
                     selectedMeter?.let { meter ->
                         onTakeReading(meter.id)
                     }
                 }
             )
+        } else {
+            Timber.d("WorkMapTab: BottomSheet не показан, selectedMeter равен null")
         }
     }
 }
@@ -307,6 +410,8 @@ private fun buildRoute(
 
     val sourceLat = userLocation?.first ?: return
     val sourceLon = userLocation.second
+
+    Timber.d("buildRoute: Построение маршрута от ($sourceLat, $sourceLon) к ($destLat, $destLon) с типом $navigatorType")
 
     val uri = when (navigatorType) {
         NavigatorType.GOOGLE_MAPS -> {
@@ -327,8 +432,10 @@ private fun buildRoute(
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
     try {
+        Timber.d("buildRoute: Запуск навигатора с URI $uri")
         context.startActivity(intent)
     } catch (e: Exception) {
+        Timber.e("buildRoute: Ошибка при запуске навигатора: ${e.message}")
         // Обработка ошибок (например, если требуемый навигатор не установлен)
         // В этом случае можно открыть системный навигатор как запасной вариант
         if (navigatorType != NavigatorType.SYSTEM_DEFAULT) {
@@ -337,8 +444,10 @@ private fun buildRoute(
             defaultIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
             try {
+                Timber.d("buildRoute: Запуск системного навигатора с URI $defaultUri")
                 context.startActivity(defaultIntent)
             } catch (e: Exception) {
+                Timber.e("buildRoute: Ошибка при запуске системного навигатора: ${e.message}")
                 // Ничего не делаем, если и это не сработало
             }
         }

@@ -10,6 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.common.ui.components.meters.MeterTypeIcon
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,8 +21,13 @@ fun MapBottomSheet(
     onTakeReading: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    Timber.d("MapBottomSheet: Showing sheet for meter ${meter.number}")
+
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            Timber.d("MapBottomSheet: Dismissing sheet for meter ${meter.number}")
+            onDismiss()
+        },
         modifier = modifier.fillMaxWidth()
     ) {
         Column(
