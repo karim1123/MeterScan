@@ -14,7 +14,7 @@ internal class WorkCoordinator(
     val state = viewModel.uiState
 
     fun onMeterSelected(meterId: String) {
-       //viewModel.execute(WorkAction.MeterSelected(meterId))
+        //viewModel.execute(WorkAction.MeterSelected(meterId))
         //navController.navigate("${NavigationRoute.METER_DETAILS}/$meterId")
     }
 
@@ -23,11 +23,27 @@ internal class WorkCoordinator(
     }
 
     fun onTakeReading(meterId: String) {
-        NavigationHolder.rootNavController?.navigate("${NavigationRoute.METER_SCAN.route}/$meterId?goBack=true")
+        viewModel.execute(WorkAction.ShowReadingDialog(meterId))
     }
 
     fun onNavigationHandled() {
         viewModel.execute(WorkAction.NavigationHandled)
+    }
+
+    fun onSaveReading(reading: String) {
+        viewModel.execute(WorkAction.SaveReading(reading))
+    }
+
+    fun onConfirmLowerValue() {
+        viewModel.execute(WorkAction.ConfirmLowerValue)
+    }
+
+    fun onDismissReadingDialog() {
+        viewModel.execute(WorkAction.DismissReadingDialog)
+    }
+
+    fun onDismissLowerValueWarning() {
+        viewModel.execute(WorkAction.DismissLowerValueWarning)
     }
 }
 

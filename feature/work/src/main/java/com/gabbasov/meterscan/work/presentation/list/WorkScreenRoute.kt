@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gabbasov.meterscan.ui.components.meters.SearchTextField
+import com.gabbasov.meterscan.ui.dialog.LowerValueWarningDialog
+import com.gabbasov.meterscan.ui.dialog.ReadingInputDialog
 import com.gabbasov.meterscan.work.presentation.list.pager.WorkScreenViewPager
 import kotlinx.coroutines.launch
 
@@ -42,6 +44,30 @@ internal fun WorkScreenRoute(
         state.navigateToScan?.let { meterId ->
             coordinator.onNavigationHandled()
         }
+    }
+
+    if (state.showReadingDialog) {
+        val meterId = state.selectedMeterId ?: return@with
+        val meter = state.meters.find { it.id == meterId }
+
+        ReadingInputDialog(
+            lastReading = meter?.readings?.maxByOrNull { it.date }?.value,
+            onDismiss = { coordinator.onDismissReadingDialog() },
+            onSave = { coordinator.onSaveReading(it) }
+        )
+    }
+
+    if (state.showLowerValueWarning) {
+        val meterId = state.selectedMeterId ?: return@with
+        val meter = state.meters.find { it.id == meterId }
+
+        LowerValueWarningDialog(
+            reading = state.newReading,
+            lastReading = meter?.readings?.maxByOrNull { it.date }?.value ?: 0.0,
+            onConfirm = { coordinator.onConfirmLowerValue() },
+            onEdit = { coordinator.onDismissLowerValueWarning() },
+            onDismiss = { coordinator.onDismissLowerValueWarning() }
+        )
     }
 
     Scaffold(

@@ -15,6 +15,10 @@ internal data class WorkState(
     val filteredMeters: ImmutableList<Meter> = persistentListOf(),
     val searchQuery: String = "",
     val navigateToScan: String? = null,
+    val showReadingDialog: Boolean = false,
+    val newReading: String = "",
+    val showLowerValueWarning: Boolean = false,
+    val selectedMeterId: String? = null,
     override val isLoading: Boolean = false,
     override val error: Text? = null,
 ) : BaseState()
@@ -29,4 +33,9 @@ internal sealed interface WorkAction : BaseAction {
         val meterId: String,
         val newState: MeterState
     ) : WorkAction
+    data class SaveReading(val reading: String) : WorkAction
+    data object ConfirmLowerValue : WorkAction
+    data object DismissReadingDialog : WorkAction
+    data object DismissLowerValueWarning : WorkAction
+    data class ShowReadingDialog(val meterId: String) : WorkAction
 }
