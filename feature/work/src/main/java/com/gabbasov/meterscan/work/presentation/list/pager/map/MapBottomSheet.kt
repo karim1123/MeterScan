@@ -10,10 +10,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.common.ui.components.meters.MeterTypeIcon
-import com.skydoves.flexible.bottomsheet.material3.FlexibleBottomSheet
-import com.skydoves.flexible.core.FlexibleSheetSize
-import com.skydoves.flexible.core.rememberFlexibleBottomSheetState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapBottomSheet(
     meter: Meter,
@@ -22,16 +20,9 @@ fun MapBottomSheet(
     onTakeReading: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val sheetState = rememberFlexibleBottomSheetState(
-        flexibleSheetSize = FlexibleSheetSize(
-            fullyExpanded = 0.45f, // Высота bottom sheet относительно экрана
-        ),
-        skipSlightlyExpanded = true,
-    )
-
-    FlexibleBottomSheet(
-        sheetState = sheetState,
-        onDismissRequest = onDismiss
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
