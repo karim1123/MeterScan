@@ -15,10 +15,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.gabbasov.meterscan.common.R
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.model.meter.MeterType
 import com.gabbasov.meterscan.model.navigator.NavigatorType
+import com.gabbasov.meterscan.work.R
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -26,12 +26,16 @@ import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 
 private const val ANIMATION_DURATION = 0.3f
+private const val MIN_ZOOM = 10f
+private const val MAX_ZOOM = 18f
+private const val BASE_ZOOM = 15f
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -49,6 +53,7 @@ fun WorkMapTab(
     var selectedMeter by remember { mutableStateOf<Meter?>(null) }
     var mapView by remember { mutableStateOf<MapView?>(null) }
     var map by remember { mutableStateOf<Map?>(null) }
+    var previousZoom by remember { mutableStateOf(15.0f) }
 
     val locationPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -69,16 +74,23 @@ fun WorkMapTab(
                     mapView = this
                     map = this.mapWindow.map
 
-                    // Устанавливаем начальное положение камеры (если есть местоположение пользователя)
+                    // Устанавливаем начальное положение камеры
                     userLocation?.let { (latitude, longitude) ->
                         this.mapWindow.map.move(
                             CameraPosition(
                                 Point(latitude, longitude),
-                                15.0f, 0.0f, 0.0f
+                                BASE_ZOOM, 0.0f, 0.0f
                             ),
                             Animation(Animation.Type.SMOOTH, ANIMATION_DURATION),
                             null
                         )
+                    }
+
+                    // Правильная сигнатура с 4 параметрами
+                    this.mapWindow.map.addCameraListener { _, cameraPosition, _, finished ->
+                        if (finished) {
+                            previousZoom = cameraPosition.zoom
+                        }
                     }
                 }
             },
@@ -97,16 +109,21 @@ fun WorkMapTab(
                                 MeterType.GAS -> R.drawable.ic_gas
                             }
 
-                            // Создаем bitmap с помощью нашей утилиты
+                            // Создаем bitmap
                             val bitmap = MapIconUtils.createMeterIconBitmap(context, iconResId, meter.type)
 
-                            // Используем bitmap для маркера
+                            // Масштабирование через IconStyle
+                            val iconStyle = IconStyle().apply {
+                                this.scale = 0.8f
+                                this.zIndex = 0.5f
+                            }
+
                             val placemarkObject = view.mapWindow.map.mapObjects.addPlacemark(
                                 point,
-                                ImageProvider.fromBitmap(bitmap)
+                                ImageProvider.fromBitmap(bitmap),
+                                iconStyle
                             )
 
-                            // Добавляем обработчик нажатия
                             placemarkObject.addTapListener(MapObjectTapListener { _, _ ->
                                 selectedMeter = meter
                                 true
@@ -117,9 +134,18 @@ fun WorkMapTab(
 
                 userLocation?.let { (latitude, longitude) ->
                     val locationBitmap = MapIconUtils.createLocationMarkerBitmap(context)
+                    val zoom = view.mapWindow.map.cameraPosition.zoom
+                    val locationScale = 0.7f + (zoom - MIN_ZOOM) / (MAX_ZOOM - MIN_ZOOM) * 0.8f
+
+                    val locationStyle = IconStyle().apply {
+                        this.scale = locationScale.coerceIn(0.7f, 1.5f)
+                        this.zIndex = 1.0f
+                    }
+
                     view.mapWindow.map.mapObjects.addPlacemark(
                         Point(latitude, longitude),
-                        ImageProvider.fromBitmap(locationBitmap)
+                        ImageProvider.fromBitmap(locationBitmap),
+                        locationStyle
                     )
                 }
             },
@@ -151,7 +177,7 @@ fun WorkMapTab(
                     .padding(bottom = 32.dp)
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(com.gabbasov.meterscan.work.R.drawable.ic_current_location),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_current_location),
                     contentDescription = "Мое местоположение",
                     tint = Color.Black
                 )
@@ -198,14 +224,6 @@ fun WorkMapTab(
         }
     }
 }
-
-
-
-
-
-
-
-
 
 // Функция для построения маршрута в навигаторе
 private fun buildRoute(

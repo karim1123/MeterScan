@@ -18,41 +18,32 @@ object MapIconUtils {
      * Создает Bitmap иконки счетчика с кружком и тинтом для отображения на карте
      */
     fun createMeterIconBitmap(context: Context, iconResId: Int, meterType: MeterType): Bitmap {
-        // Определяем цвет в зависимости от типа счетчика
         val tintColor = when (meterType) {
-            MeterType.ELECTRICITY -> Color(0xFFFFC107) // Желтый для электричества
-            MeterType.WATER -> Color(0xFF2196F3) // Синий для воды
-            MeterType.GAS -> Color(0xFFFF5722) // Оранжевый для газа
+            MeterType.ELECTRICITY -> Color(0xFFFFC107)
+            MeterType.WATER -> Color(0xFF2196F3)
+            MeterType.GAS -> Color(0xFFFF5722)
         }
 
-        // Создаем Drawable из ресурса
         val drawable = AppCompatResources.getDrawable(context, iconResId)
             ?: throw IllegalArgumentException("Resource not found: $iconResId")
 
-        // Устанавливаем размеры
         val size = context.resources.getDimensionPixelSize(R.dimen.map_icon_size)
 
-        // Создаем bitmap для фона (круг)
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
 
-        // Рисуем круглый фон
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = tintColor.copy(alpha = 0.2f).toArgb()
             style = Paint.Style.FILL
         }
         canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
 
-        // Устанавливаем tint для drawable
         DrawableCompat.setTint(drawable, tintColor.toArgb())
-        DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN)
 
-        // Устанавливаем bounds для центрирования иконки (60% от размера круга)
         val iconSize = (size * 0.6f).toInt()
         val offset = (size - iconSize) / 2
         drawable.setBounds(offset, offset, offset + iconSize, offset + iconSize)
 
-        // Рисуем иконку
         drawable.draw(canvas)
 
         return bitmap
