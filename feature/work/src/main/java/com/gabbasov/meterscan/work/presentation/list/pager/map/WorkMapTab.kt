@@ -5,17 +5,23 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.gabbasov.meterscan.common.R
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.model.meter.MeterType
 import com.gabbasov.meterscan.model.navigator.NavigatorType
+import com.gabbasov.meterscan.work.R.*
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -23,6 +29,7 @@ import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.mapview.MapView
@@ -44,6 +51,8 @@ fun WorkMapTab(
     val context = LocalContext.current
 
     var selectedMeter by remember { mutableStateOf<Meter?>(null) }
+    var mapView by remember { mutableStateOf<MapView?>(null) }
+    var map by remember { mutableStateOf<Map?>(null) }
 
     val locationPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -54,11 +63,6 @@ fun WorkMapTab(
             onRequestLocation()
         }
     }
-
-    // Состояние для MapView
-    var mapView by remember { mutableStateOf<MapView?>(null) }
-    var map by remember { mutableStateOf<Map?>(null) }
-
 
     Box(modifier = modifier.fillMaxSize()) {
         // Отображение карты
@@ -119,6 +123,34 @@ fun WorkMapTab(
             modifier = Modifier.fillMaxSize()
         )
 
+        if (locationPermissionState.status.isGranted) {
+            FloatingActionButton(
+                onClick = {
+                    userLocation?.let { (latitude, longitude) ->
+                        map?.move(
+                            CameraPosition(
+                                Point(latitude, longitude),
+                                17.0f, 0.0f, 0.0f
+                            ),
+                            Animation(Animation.Type.SMOOTH, ANIMATION_DURATION),
+                            null
+                        )
+                    } ?: onRequestLocation()
+                },
+                containerColor = Color.Transparent,
+                elevation = FloatingActionButtonDefaults.elevation(0.dp),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 32.dp)
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(drawable.ic_current_location),
+                    contentDescription = "Мое местоположение",
+                    tint = Color.Black
+                )
+            }
+        }
+
         // Если нет разрешения на местоположение, показываем кнопку запроса
         if (!locationPermissionState.status.isGranted) {
             Card(
@@ -160,8 +192,13 @@ fun WorkMapTab(
     }
 }
 
-// Флаг для отслеживания инициализации MapKit
-private var isMapKitInitialized = false
+
+
+
+
+
+
+
 
 // Функция для построения маршрута в навигаторе
 private fun buildRoute(
