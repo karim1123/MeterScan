@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,7 +19,6 @@ import com.gabbasov.meterscan.common.R
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.model.meter.MeterType
 import com.gabbasov.meterscan.model.navigator.NavigatorType
-import com.gabbasov.meterscan.work.R.*
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -29,7 +26,6 @@ import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
-import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.mapview.MapView
@@ -101,10 +97,13 @@ fun WorkMapTab(
                                 MeterType.GAS -> R.drawable.ic_gas
                             }
 
-                            // Используем правильную сигнатуру метода addPlacemark
+                            // Создаем bitmap с помощью нашей утилиты
+                            val bitmap = MapIconUtils.createMeterIconBitmap(context, iconResId, meter.type)
+
+                            // Используем bitmap для маркера
                             val placemarkObject = view.mapWindow.map.mapObjects.addPlacemark(
                                 point,
-                                ImageProvider.fromResource(context, iconResId)
+                                ImageProvider.fromBitmap(bitmap)
                             )
 
                             // Добавляем обработчик нажатия
@@ -114,6 +113,14 @@ fun WorkMapTab(
                             })
                         }
                     }
+                }
+
+                userLocation?.let { (latitude, longitude) ->
+                    val locationBitmap = MapIconUtils.createLocationMarkerBitmap(context)
+                    view.mapWindow.map.mapObjects.addPlacemark(
+                        Point(latitude, longitude),
+                        ImageProvider.fromBitmap(locationBitmap)
+                    )
                 }
             },
             onRelease = {
@@ -144,7 +151,7 @@ fun WorkMapTab(
                     .padding(bottom = 32.dp)
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(drawable.ic_current_location),
+                    imageVector = ImageVector.vectorResource(com.gabbasov.meterscan.work.R.drawable.ic_current_location),
                     contentDescription = "Мое местоположение",
                     tint = Color.Black
                 )
