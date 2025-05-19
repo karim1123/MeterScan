@@ -31,6 +31,8 @@ import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
+import kotlinx.coroutines.delay
+import kotlin.math.log2
 
 private const val ANIMATION_DURATION = 0.3f
 private const val MIN_ZOOM = 10f
@@ -54,6 +56,7 @@ fun WorkMapTab(
     var mapView by remember { mutableStateOf<MapView?>(null) }
     var map by remember { mutableStateOf<Map?>(null) }
     var previousZoom by remember { mutableStateOf(15.0f) }
+    var isMapInitialized by remember { mutableStateOf(false) }
 
     val locationPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
@@ -62,6 +65,73 @@ fun WorkMapTab(
     LaunchedEffect(locationPermissionState.status.isGranted) {
         if (locationPermissionState.status.isGranted && userLocation == null) {
             onRequestLocation()
+        }
+    }
+
+    LaunchedEffect(mapView, meters, userLocation) {
+        if (mapView != null && !isMapInitialized && meters.isNotEmpty()) {
+            delay(500) // Задержка 500мс для инициализации карты
+
+            val visiblePoints = mutableListOf<Point>()
+
+            // Собираем все точки счетчиков
+            meters.forEach { meter ->
+                meter.address.latitude?.let { lat ->
+                    meter.address.longitude?.let { lon ->
+                        visiblePoints.add(Point(lat, lon))
+                    }
+                }
+            }
+
+            // Добавляем текущее местоположение пользователя
+            userLocation?.let { (lat, lon) ->
+                visiblePoints.add(Point(lat, lon))
+            }
+
+            if (visiblePoints.isNotEmpty()) {
+                // Найдем минимальные и максимальные координаты
+                var minLat = Double.MAX_VALUE
+                var maxLat = Double.MIN_VALUE
+                var minLon = Double.MAX_VALUE
+                var maxLon = Double.MIN_VALUE
+
+                visiblePoints.forEach { point ->
+                    minLat = minOf(minLat, point.latitude)
+                    maxLat = maxOf(maxLat, point.latitude)
+                    minLon = minOf(minLon, point.longitude)
+                    maxLon = maxOf(maxLon, point.longitude)
+                }
+
+                // Центральная точка
+                val centerLat = (minLat + maxLat) / 2
+                val centerLon = (minLon + maxLon) / 2
+
+                // Вычисляем оптимальный зум
+                val latDelta = maxLat - minLat
+                val lonDelta = maxLon - minLon
+
+                // Коэффициент для запаса по краям (уменьшаем зум)
+                val padding = 0.5
+                val zoomLat = log2(360.0 / (latDelta * padding)) - 1
+                val zoomLon = log2(360.0 / (lonDelta * padding)) - 1
+
+                // Берем минимальный зум из двух направлений для отображения всех точек
+                val optimalZoom = minOf(zoomLat, zoomLon).toFloat().coerceIn(MIN_ZOOM, MAX_ZOOM)
+
+                // Перемещаем камеру на оптимальный зум
+                map?.move(
+                    CameraPosition(
+                        Point(centerLat, centerLon),
+                        optimalZoom,
+                        0.0f,
+                        0.0f
+                    ),
+                    Animation(Animation.Type.SMOOTH, ANIMATION_DURATION),
+                    null
+                )
+
+                isMapInitialized = true
+            }
         }
     }
 
