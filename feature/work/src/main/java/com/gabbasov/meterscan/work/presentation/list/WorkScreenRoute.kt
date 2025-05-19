@@ -83,10 +83,11 @@ internal fun WorkScreenRoute(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            SearchTextField(
+            // пока не нужно
+            /*SearchTextField(
                 value = state.searchQuery,
                 onValueChange = coordinator::onSearchQueryChanged
-            )
+            )*/
 
             WorkScreenViewPager(
                 metersState = state,
