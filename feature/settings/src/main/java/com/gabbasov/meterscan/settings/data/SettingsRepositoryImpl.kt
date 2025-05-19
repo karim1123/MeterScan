@@ -22,7 +22,7 @@ class SettingsRepositoryImpl(
     }
 
     override suspend fun getNavigatorType(): NavigatorType = withContext(Dispatchers.IO) {
-        val typeOrdinal = prefs.getInt(KEY_NAVIGATOR_TYPE, NavigatorType.GOOGLE_MAPS.ordinal)
+        val typeOrdinal = prefs.getInt(KEY_NAVIGATOR_TYPE, NavigatorType.SYSTEM_DEFAULT.ordinal)
         NavigatorType.entries[typeOrdinal]
     }
 
