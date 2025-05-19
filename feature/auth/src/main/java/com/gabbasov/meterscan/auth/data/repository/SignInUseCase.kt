@@ -3,7 +3,7 @@ package com.gabbasov.meterscan.auth.data.repository
 import android.util.Patterns
 import com.gabbasov.meterscan.model.auth.User
 import com.gabbasov.meterscan.repository.AuthRepository
-import com.gabbasov.meterscan.network.Errors
+import com.gabbasov.meterscan.common.network.Errors
 import com.gabbasov.meterscan.base.Resource
 
 class SignInUseCase(

@@ -1,6 +1,6 @@
 @file:Suppress("UNSUPPORTED_FEATURE")
 
-package com.gabbasov.meterscan.ui
+package com.gabbasov.meterscan.common.ui
 
 import android.content.Context
 import androidx.annotation.StringRes

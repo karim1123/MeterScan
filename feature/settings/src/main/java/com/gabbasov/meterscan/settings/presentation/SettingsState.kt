@@ -1,8 +1,9 @@
 package com.gabbasov.meterscan.settings.presentation
 
 import androidx.compose.runtime.Stable
-import com.gabbasov.meterscan.domain.base.BaseAction
-import com.gabbasov.meterscan.domain.base.BaseState
+import com.gabbasov.meterscan.common.domain.base.BaseAction
+import com.gabbasov.meterscan.common.domain.base.BaseState
+import com.gabbasov.meterscan.common.ui.Text
 import com.gabbasov.meterscan.model.navigator.NavigatorType
 
 @Stable
@@ -16,7 +17,7 @@ data class SettingsState(
     val highConfidenceThreshold: Float = 0.95f,
 
     override val isLoading: Boolean = false,
-    override val error: com.gabbasov.meterscan.ui.Text? = null
+    override val error: Text? = null
 ) : BaseState()
 
 sealed interface SettingsAction : BaseAction {

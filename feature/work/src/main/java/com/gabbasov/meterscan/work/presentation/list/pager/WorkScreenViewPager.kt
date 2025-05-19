@@ -10,10 +10,14 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.gabbasov.meterscan.work.presentation.list.WorkState
+import com.gabbasov.meterscan.work.presentation.list.pager.list.WorkMetersList
+import com.gabbasov.meterscan.work.presentation.list.pager.map.WorkMapTab
 import kotlinx.coroutines.launch
 
 @Composable
@@ -21,10 +25,25 @@ internal fun WorkScreenViewPager(
     metersState: WorkState,
     onMeterClick: (String) -> Unit,
     onTakeReading: (String) -> Unit,
+    onTabSelected: (Int) -> Unit,
+    onRequestLocation: () -> Unit,
+    onBuildRoute: (com.gabbasov.meterscan.model.meter.Meter) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val pagerState = rememberPagerState(pageCount = { 2 })
+    val pagerState = rememberPagerState(pageCount = { 2 }, initialPage = metersState.selectedTabIndex)
     val coroutineScope = rememberCoroutineScope()
+
+    // Синхронизация текущей страницы с выбранным табом
+    LaunchedEffect(metersState.selectedTabIndex) {
+        if (pagerState.currentPage != metersState.selectedTabIndex) {
+            pagerState.animateScrollToPage(metersState.selectedTabIndex)
+        }
+    }
+
+    // Уведомление о смене вкладки
+    LaunchedEffect(pagerState.currentPage) {
+        onTabSelected(pagerState.currentPage)
+    }
 
     Column(modifier = modifier.fillMaxSize()) {
         TabRow(
@@ -64,13 +83,15 @@ internal fun WorkScreenViewPager(
                     )
                 }
                 1 -> {
-                    // Карта (будет реализована позже)
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("Карта (в разработке)")
-                    }
+                    WorkMapTab(
+                        meters = metersState.meters,
+                        userLocation = metersState.userLocation,
+                        navigatorType = metersState.navigatorType,
+                        onRequestLocation = onRequestLocation,
+                        onBuildRoute = onBuildRoute,
+                        onTakeReading = onTakeReading,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
             }
         }

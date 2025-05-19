@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.model.meter.MeterState
-import com.gabbasov.meterscan.ui.components.meters.MeterTypeIcon
+import com.gabbasov.meterscan.common.ui.components.meters.MeterTypeIcon
 
 @Composable
 internal fun WorkMeterListItem(

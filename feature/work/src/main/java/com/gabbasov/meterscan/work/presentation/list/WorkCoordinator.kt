@@ -1,21 +1,33 @@
 package com.gabbasov.meterscan.work.presentation.list
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.location.Location
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.gabbasov.meterscan.NavigationRoute
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
-import com.gabbasov.meterscan.ui.NavigationHolder
+import com.gabbasov.meterscan.model.meter.Meter
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import org.koin.androidx.compose.koinViewModel
 
 internal class WorkCoordinator(
     private val viewModel: WorkViewModel,
     private val navController: NavHostController,
+    private val context: Context
 ) {
     val state = viewModel.uiState
 
+    // Клиент для получения местоположения
+    private val fusedLocationClient: FusedLocationProviderClient by lazy {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+
     fun onMeterSelected(meterId: String) {
-        //viewModel.execute(WorkAction.MeterSelected(meterId))
-        //navController.navigate("${NavigationRoute.METER_DETAILS}/$meterId")
+        // Пока отключаем навигацию к деталям счетчика с карты
+        // навигация работает из списка
     }
 
     fun onSearchQueryChanged(query: String) {
@@ -45,6 +57,33 @@ internal class WorkCoordinator(
     fun onDismissLowerValueWarning() {
         viewModel.execute(WorkAction.DismissLowerValueWarning)
     }
+
+    // Методы для работы с картой
+
+    @SuppressLint("MissingPermission")
+    fun requestUserLocation() {
+        try {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                location?.let {
+                    viewModel.execute(
+                        WorkAction.SetUserLocation(
+                            Pair(it.latitude, it.longitude)
+                        )
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            // Обработка ошибки получения местоположения
+        }
+    }
+
+    fun onBuildRoute(meter: Meter) {
+        viewModel.execute(WorkAction.BuildRoute(meter))
+    }
+
+    fun onTabSelected(index: Int) {
+        viewModel.execute(WorkAction.SetSelectedTabIndex(index))
+    }
 }
 
 @Composable
@@ -52,10 +91,13 @@ internal fun rememberWorkMetersListCoordinator(
     viewModel: WorkViewModel = koinViewModel(),
     navController: NavHostController,
 ): WorkCoordinator {
-    return remember(viewModel, navController) {
+    val context = LocalContext.current
+
+    return remember(viewModel, navController, context) {
         WorkCoordinator(
             viewModel = viewModel,
             navController = navController,
+            context = context
         )
     }
 }

@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.scan.R
 import com.gabbasov.meterscan.scan.presentation.components.MeterInfoCard
-import com.gabbasov.meterscan.ui.components.meters.SearchTextField
+import com.gabbasov.meterscan.common.ui.components.meters.SearchTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

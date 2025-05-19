@@ -7,8 +7,8 @@ import com.gabbasov.meterscan.repository.MetersRepository
 import com.gabbasov.meterscan.repository.ScanSettingsRepository
 import com.gabbasov.meterscan.scan.data.ScanSettingsRepositoryImpl.Companion.STABILITY_THRESHOLD
 import com.gabbasov.meterscan.scan.domain.DigitBox
-import com.gabbasov.meterscan.ui.BaseViewModel
-import com.gabbasov.meterscan.ui.Text
+import com.gabbasov.meterscan.common.ui.BaseViewModel
+import com.gabbasov.meterscan.common.ui.Text
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

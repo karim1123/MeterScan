@@ -24,7 +24,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.gabbasov.meterscan.auth.R
 import com.gabbasov.meterscan.designsystem.MeterScanTheme
-import com.gabbasov.meterscan.ui.TextFieldValue
+import com.gabbasov.meterscan.common.ui.TextFieldValue
 
 @Composable
 internal fun PasswordTextField(
@@ -76,7 +76,7 @@ internal fun PasswordTextField(
 private fun PasswordTextFieldPreview() {
     MeterScanTheme {
         PasswordTextField(
-            TextFieldValue("password", com.gabbasov.meterscan.ui.Text.RawString("Password")),
+            TextFieldValue("password", com.gabbasov.meterscan.common.ui.Text.RawString("Password")),
             onPasswordChanged = {},
         )
     }
@@ -89,7 +89,7 @@ private fun PasswordErrorTextFieldPreview() {
         PasswordTextField(
             TextFieldValue(
                 "password",
-                com.gabbasov.meterscan.ui.Text.RawString("Password"),
+                com.gabbasov.meterscan.common.ui.Text.RawString("Password"),
                 true
             ),
             onPasswordChanged = {},

@@ -23,6 +23,10 @@
             android:name="androidx.camera.lifecycle.ProcessCameraProvider"
             android:value="androidx.camera.camera2.Camera2Config" />
 
+        <meta-data
+            android:name="com.yandex.mapkit.MapKitFactory"
+            android:value="a4c1233b-b56f-4d66-9e90-3a6824248bae" />
+
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"

@@ -2,11 +2,13 @@ package com.gabbasov.meterscan.work.presentation.list
 
 import androidx.lifecycle.viewModelScope
 import com.gabbasov.meterscan.repository.MetersRepository
+import com.gabbasov.meterscan.repository.SettingsRepository
 import com.gabbasov.meterscan.base.Resource
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.model.meter.MeterState
-import com.gabbasov.meterscan.ui.BaseViewModel
-import com.gabbasov.meterscan.ui.Text
+import com.gabbasov.meterscan.model.navigator.NavigatorType
+import com.gabbasov.meterscan.common.ui.BaseViewModel
+import com.gabbasov.meterscan.common.ui.Text
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +17,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 internal class WorkViewModel(
-    private val metersRepository: MetersRepository
+    private val metersRepository: MetersRepository,
+    private val settingsRepository: SettingsRepository
 ) : BaseViewModel() {
     private val _uiState = MutableStateFlow(WorkState())
     val uiState = _uiState.asStateFlow()
@@ -28,6 +31,7 @@ internal class WorkViewModel(
 
     init {
         execute(WorkAction.LoadMeters)
+        execute(WorkAction.LoadNavigatorType)
     }
 
     fun execute(action: WorkAction) {
@@ -44,6 +48,21 @@ internal class WorkViewModel(
             is WorkAction.DismissReadingDialog -> state = state.copy(showReadingDialog = false)
             is WorkAction.DismissLowerValueWarning -> state = state.copy(showLowerValueWarning = false)
             is WorkAction.ShowReadingDialog -> showReadingDialog(action.meterId)
+            is WorkAction.SetUserLocation -> state = state.copy(userLocation = action.location)
+            is WorkAction.LoadNavigatorType -> loadNavigatorType()
+            is WorkAction.BuildRoute -> Unit // Обработка через MapBottomSheet и координатор
+            is WorkAction.SetSelectedTabIndex -> Unit
+        }
+    }
+
+    private fun loadNavigatorType() = viewModelScope.launch {
+        try {
+            val navigatorType = settingsRepository.getNavigatorType()
+            state = state.copy(navigatorType = navigatorType)
+        } catch (e: Exception) {
+            state = state.copy(
+                error = Text.RawString("Ошибка загрузки настроек навигатора: ${e.message}")
+            )
         }
     }
 

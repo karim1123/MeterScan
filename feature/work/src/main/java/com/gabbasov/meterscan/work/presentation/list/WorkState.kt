@@ -1,11 +1,12 @@
 package com.gabbasov.meterscan.work.presentation.list
 
 import androidx.compose.runtime.Stable
-import com.gabbasov.meterscan.domain.base.BaseAction
-import com.gabbasov.meterscan.domain.base.BaseState
+import com.gabbasov.meterscan.common.domain.base.BaseAction
+import com.gabbasov.meterscan.common.domain.base.BaseState
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.model.meter.MeterState
-import com.gabbasov.meterscan.ui.Text
+import com.gabbasov.meterscan.model.navigator.NavigatorType
+import com.gabbasov.meterscan.common.ui.Text
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -19,6 +20,9 @@ internal data class WorkState(
     val newReading: String = "",
     val showLowerValueWarning: Boolean = false,
     val selectedMeterId: String? = null,
+    val userLocation: Pair<Double, Double>? = null, // Местоположение пользователя
+    val navigatorType: NavigatorType = NavigatorType.SYSTEM_DEFAULT, // Тип навигатора из настроек
+    val selectedTabIndex: Int = 0, // Индекс выбранной вкладки (0 - список, 1 - карта)
     override val isLoading: Boolean = false,
     override val error: Text? = null,
 ) : BaseState()
@@ -38,4 +42,10 @@ internal sealed interface WorkAction : BaseAction {
     data object DismissReadingDialog : WorkAction
     data object DismissLowerValueWarning : WorkAction
     data class ShowReadingDialog(val meterId: String) : WorkAction
+
+    // Новые действия для работы с картой
+    data class SetUserLocation(val location: Pair<Double, Double>) : WorkAction
+    data object LoadNavigatorType : WorkAction
+    data class BuildRoute(val meter: Meter) : WorkAction
+    data class SetSelectedTabIndex(val index: Int) : WorkAction
 }

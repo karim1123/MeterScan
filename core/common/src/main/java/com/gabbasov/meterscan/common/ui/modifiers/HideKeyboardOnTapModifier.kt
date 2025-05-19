@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.ui.modifiers
+package com.gabbasov.meterscan.common.ui.modifiers
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.Modifier

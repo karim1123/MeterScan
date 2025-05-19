@@ -10,5 +10,5 @@ import org.koin.dsl.module
 
 val workFeatureModule = module {
     singleOf(::WorkNavigation) bind WorkFeatureApi::class
-    viewModel { WorkViewModel(get()) }
+    viewModel { WorkViewModel(get(), get()) }
 }

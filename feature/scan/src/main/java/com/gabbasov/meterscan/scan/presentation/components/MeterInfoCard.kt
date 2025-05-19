@@ -21,7 +21,7 @@ import com.gabbasov.meterscan.model.meter.Address
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.model.meter.MeterReading
 import com.gabbasov.meterscan.model.meter.MeterType
-import com.gabbasov.meterscan.ui.components.meters.MeterTypeIcon
+import com.gabbasov.meterscan.common.ui.components.meters.MeterTypeIcon
 import java.time.LocalDate
 
 @Composable

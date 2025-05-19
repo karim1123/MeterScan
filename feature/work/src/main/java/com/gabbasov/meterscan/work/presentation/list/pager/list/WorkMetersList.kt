@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.work.presentation.list.pager
+package com.gabbasov.meterscan.work.presentation.list.pager.list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

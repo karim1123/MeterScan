@@ -47,7 +47,7 @@ import com.gabbasov.meterscan.scan.presentation.components.RecognitionProgressIn
 import com.gabbasov.meterscan.scan.presentation.components.bottomsheet.MeterReadingBottomSheet
 import com.gabbasov.meterscan.scan.presentation.components.meterselection.MeterSelectionScreen
 import com.gabbasov.meterscan.scan.presentation.dialog.MeterSelectionDialog
-import com.gabbasov.meterscan.ui.dialog.LowerValueWarningDialog
+import com.gabbasov.meterscan.common.ui.dialog.LowerValueWarningDialog
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState

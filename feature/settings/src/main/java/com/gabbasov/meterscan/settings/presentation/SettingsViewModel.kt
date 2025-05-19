@@ -7,8 +7,8 @@ import com.gabbasov.meterscan.model.navigator.NavigatorType
 import com.gabbasov.meterscan.repository.AuthRepository
 import com.gabbasov.meterscan.repository.ScanSettingsRepository
 import com.gabbasov.meterscan.repository.SettingsRepository
-import com.gabbasov.meterscan.ui.BaseViewModel
-import com.gabbasov.meterscan.ui.Text
+import com.gabbasov.meterscan.common.ui.BaseViewModel
+import com.gabbasov.meterscan.common.ui.Text
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

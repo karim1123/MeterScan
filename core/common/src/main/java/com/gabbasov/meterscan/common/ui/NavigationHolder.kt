@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.ui
+package com.gabbasov.meterscan.common.ui
 
 import androidx.navigation.NavHostController
 

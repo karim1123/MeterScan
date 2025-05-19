@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.gabbasov.meterscan.presentation.MainActivityViewModel
 import com.gabbasov.meterscan.register
-import com.gabbasov.meterscan.ui.NavigationHolder
+import com.gabbasov.meterscan.common.ui.NavigationHolder
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import org.koin.androidx.compose.koinViewModel
 

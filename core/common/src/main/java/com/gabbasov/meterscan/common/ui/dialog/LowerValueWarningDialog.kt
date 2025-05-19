@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.ui.dialog
+package com.gabbasov.meterscan.common.ui.dialog
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -7,7 +7,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.gabbasov.meterscan.R
+import com.gabbasov.meterscan.common.R
 
 @Composable
 fun LowerValueWarningDialog(

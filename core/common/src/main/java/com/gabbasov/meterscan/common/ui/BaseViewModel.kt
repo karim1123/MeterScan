@@ -1,7 +1,7 @@
-package com.gabbasov.meterscan.ui
+package com.gabbasov.meterscan.common.ui
 
 import androidx.lifecycle.ViewModel
-import com.gabbasov.meterscan.domain.base.BaseAction
+import com.gabbasov.meterscan.common.domain.base.BaseAction
 import timber.log.Timber
 
 abstract class BaseViewModel : ViewModel() {

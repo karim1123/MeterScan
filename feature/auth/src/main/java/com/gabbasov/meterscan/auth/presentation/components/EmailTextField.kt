@@ -11,7 +11,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.gabbasov.meterscan.designsystem.MeterScanTheme
-import com.gabbasov.meterscan.ui.TextFieldValue
+import com.gabbasov.meterscan.common.ui.TextFieldValue
 
 @Composable
 internal fun EmailTextField(
@@ -44,7 +44,7 @@ internal fun EmailTextField(
 private fun EmailTextFieldPreview() {
     MeterScanTheme {
         EmailTextField(
-            TextFieldValue("email.com", com.gabbasov.meterscan.ui.Text.RawString("Email")),
+            TextFieldValue("email.com", com.gabbasov.meterscan.common.ui.Text.RawString("Email")),
             onEmailChanged = {},
         )
     }

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import com.gabbasov.meterscan.model.navigator.NavigatorType
-import com.gabbasov.meterscan.ui.NavigationHolder
+import com.gabbasov.meterscan.common.ui.NavigationHolder
 import org.koin.androidx.compose.koinViewModel
 
 class SettingsCoordinator(

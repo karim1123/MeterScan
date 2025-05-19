@@ -36,8 +36,8 @@ import com.gabbasov.meterscan.auth.presentation.components.ActionButton
 import com.gabbasov.meterscan.auth.presentation.components.EmailTextField
 import com.gabbasov.meterscan.auth.presentation.components.PasswordTextField
 import com.gabbasov.meterscan.designsystem.MeterScanTheme
-import com.gabbasov.meterscan.ui.TextFieldValue
-import com.gabbasov.meterscan.ui.modifiers.hideKeyboardOnTap
+import com.gabbasov.meterscan.common.ui.TextFieldValue
+import com.gabbasov.meterscan.common.ui.modifiers.hideKeyboardOnTap
 import kotlinx.coroutines.launch
 
 @Composable

@@ -36,28 +36,28 @@ class MockDataProvider(private val database: MeterScanDatabase) {
         val izhevskAddresses = listOf(
             Address(
                 street = "г. Ижевск, ул. Пушкинская, д. 278, кв. 15",
-                latitude = 56.8498,
-                longitude = 53.2045
+                latitude = 56.86660232497526,
+                longitude = 53.21308917116397
             ),
             Address(
                 street = "г. Ижевск, ул. Удмуртская, д. 304, кв. 78",
-                latitude = 56.8567,
-                longitude = 53.2112
+                latitude = 56.86144890091175,
+                longitude = 53.22409645419618
             ),
             Address(
                 street = "г. Ижевск, ул. Ленина, д. 45, кв. 3",
-                latitude = 56.8443,
+                latitude = 56.846432813048594,
                 longitude = 53.2067
             ),
             Address(
                 street = "г. Ижевск, ул. Молодежная, д. 111, кв. 144",
                 latitude = 56.8612,
-                longitude = 53.2234
+                longitude = 53.23336530022799
             ),
             Address(
                 street = "г. Ижевск, ул. Советская, д. 22, кв. 21",
-                latitude = 56.8489,
-                longitude = 53.2098
+                latitude = 56.8458989709475,
+                longitude = 53.21853664070378
             )
         )
 

@@ -14,6 +14,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        buildConfigField("String", "YANDEX_MAPS_API_KEY", "\"${project.findProperty("YANDEX_MAPS_API_KEY") ?: ""}\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -57,6 +63,7 @@ dependencies {
     implementation(libs.accompanist.navigation.animation)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.timber)
+    implementation(libs.flexible.bottomsheet.material3)
 
     implementation(project.dependencies.platform(libs.koin.bom))
     implementation(libs.koin.android)
@@ -76,5 +83,11 @@ dependencies {
 
     implementation (libs.compose.charts)
 
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.gson)
+
+    implementation(libs.maps.mobile)
+
+    // Для работы с местоположением
+    implementation(libs.play.services.location)
+    implementation(libs.accompanist.permissions)
 }

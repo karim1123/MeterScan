@@ -17,9 +17,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.gabbasov.meterscan.ui.components.meters.SearchTextField
-import com.gabbasov.meterscan.ui.dialog.LowerValueWarningDialog
-import com.gabbasov.meterscan.ui.dialog.ReadingInputDialog
+import com.gabbasov.meterscan.common.ui.components.meters.SearchTextField
+import com.gabbasov.meterscan.common.ui.dialog.LowerValueWarningDialog
+import com.gabbasov.meterscan.common.ui.dialog.ReadingInputDialog
 import com.gabbasov.meterscan.work.presentation.list.pager.WorkScreenViewPager
 import kotlinx.coroutines.launch
 
@@ -92,6 +92,9 @@ internal fun WorkScreenRoute(
                 metersState = state,
                 onMeterClick = coordinator::onMeterSelected,
                 onTakeReading = coordinator::onTakeReading,
+                onTabSelected = coordinator::onTabSelected,
+                onRequestLocation = coordinator::requestUserLocation,
+                onBuildRoute = coordinator::onBuildRoute,
                 modifier = Modifier.weight(1f)
             )
         }

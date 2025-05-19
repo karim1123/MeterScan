@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.gabbasov.meterscan.repository.MetersRepository
 import com.gabbasov.meterscan.base.Resource
 import com.gabbasov.meterscan.model.meter.Meter
-import com.gabbasov.meterscan.ui.BaseViewModel
-import com.gabbasov.meterscan.ui.Text
+import com.gabbasov.meterscan.common.ui.BaseViewModel
+import com.gabbasov.meterscan.common.ui.Text
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

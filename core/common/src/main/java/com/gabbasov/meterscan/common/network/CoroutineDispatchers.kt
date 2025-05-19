@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.network
+package com.gabbasov.meterscan.common.network
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

@@ -3,7 +3,7 @@ package com.gabbasov.meterscan.auth.presentation.signin
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
-import com.gabbasov.meterscan.ui.TextFieldValue
+import com.gabbasov.meterscan.common.ui.TextFieldValue
 import org.koin.androidx.compose.koinViewModel
 
 internal class SignInCoordinator(

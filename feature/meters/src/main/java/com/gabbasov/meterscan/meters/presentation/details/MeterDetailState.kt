@@ -1,10 +1,10 @@
 package com.gabbasov.meterscan.meters.presentation.details
 
 import androidx.compose.runtime.Stable
-import com.gabbasov.meterscan.domain.base.BaseAction
-import com.gabbasov.meterscan.domain.base.BaseState
+import com.gabbasov.meterscan.common.domain.base.BaseAction
+import com.gabbasov.meterscan.common.domain.base.BaseState
 import com.gabbasov.meterscan.model.meter.Meter
-import com.gabbasov.meterscan.ui.Text
+import com.gabbasov.meterscan.common.ui.Text
 
 @Stable
 internal data class MeterDetailState(

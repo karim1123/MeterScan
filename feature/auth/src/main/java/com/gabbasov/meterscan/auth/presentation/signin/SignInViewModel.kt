@@ -5,9 +5,9 @@ import com.gabbasov.meterscan.model.auth.User
 import com.gabbasov.meterscan.auth.data.repository.SignInUseCase
 import com.gabbasov.meterscan.features.MainScreenFeatureApi
 import com.gabbasov.meterscan.features.SignUpFeatureApi
-import com.gabbasov.meterscan.network.Errors
+import com.gabbasov.meterscan.common.network.Errors
 import com.gabbasov.meterscan.base.Resource
-import com.gabbasov.meterscan.ui.BaseViewModel
+import com.gabbasov.meterscan.common.ui.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

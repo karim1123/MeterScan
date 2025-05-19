@@ -1,8 +1,8 @@
-package com.gabbasov.meterscan.network
+package com.gabbasov.meterscan.common.network
 
 import androidx.annotation.StringRes
-import com.gabbasov.meterscan.R
-import com.gabbasov.meterscan.ui.Text
+import com.gabbasov.meterscan.common.R
+import com.gabbasov.meterscan.common.ui.Text
 
 enum class Errors(@StringRes val errorMessageRes: Int) {
     EMPTY_EMAIL(R.string.error_empty_email),

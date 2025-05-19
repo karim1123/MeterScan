@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.ui.components.meters
+package com.gabbasov.meterscan.common.ui.components.meters
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

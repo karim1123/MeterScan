@@ -31,8 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gabbasov.meterscan.meters.R
-import com.gabbasov.meterscan.ui.components.meters.MeterListItem
-import com.gabbasov.meterscan.ui.components.meters.SearchTextField
+import com.gabbasov.meterscan.common.ui.components.meters.MeterListItem
+import com.gabbasov.meterscan.common.ui.components.meters.SearchTextField
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 

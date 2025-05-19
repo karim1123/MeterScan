@@ -1,6 +1,6 @@
-package com.gabbasov.meterscan.domain.base
+package com.gabbasov.meterscan.common.domain.base
 
-import com.gabbasov.meterscan.ui.Text
+import com.gabbasov.meterscan.common.ui.Text
 
 abstract class BaseState(
     open val isLoading: Boolean = false,

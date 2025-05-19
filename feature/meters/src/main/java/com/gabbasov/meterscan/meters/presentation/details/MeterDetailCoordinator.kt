@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import com.gabbasov.meterscan.NavigationRoute
-import com.gabbasov.meterscan.ui.NavigationHolder
+import com.gabbasov.meterscan.common.ui.NavigationHolder
 import org.koin.androidx.compose.koinViewModel
 
 internal class MeterDetailCoordinator(

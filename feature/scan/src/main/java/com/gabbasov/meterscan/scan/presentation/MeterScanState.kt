@@ -1,8 +1,9 @@
 package com.gabbasov.meterscan.scan.presentation
 
 import androidx.compose.runtime.Stable
-import com.gabbasov.meterscan.domain.base.BaseAction
-import com.gabbasov.meterscan.domain.base.BaseState
+import com.gabbasov.meterscan.common.domain.base.BaseAction
+import com.gabbasov.meterscan.common.domain.base.BaseState
+import com.gabbasov.meterscan.common.ui.Text
 import com.gabbasov.meterscan.model.meter.Meter
 import com.gabbasov.meterscan.scan.domain.DigitBox
 import kotlinx.collections.immutable.ImmutableList
@@ -31,7 +32,7 @@ data class MeterScanState(
     val allMeters: List<Meter> = emptyList(),
     val showMeterSelectionScreen: Boolean = false,
     override val isLoading: Boolean = false,
-    override val error: com.gabbasov.meterscan.ui.Text? = null
+    override val error: Text? = null
 ) : BaseState()
 
 sealed interface MeterScanAction : BaseAction {

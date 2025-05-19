@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.ui.components.bottombar
+package com.gabbasov.meterscan.common.ui.components.bottombar
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List

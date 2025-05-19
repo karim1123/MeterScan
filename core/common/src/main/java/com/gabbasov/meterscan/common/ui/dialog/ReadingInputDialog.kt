@@ -1,4 +1,4 @@
-package com.gabbasov.meterscan.ui.dialog
+package com.gabbasov.meterscan.common.ui.dialog
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,7 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import com.gabbasov.meterscan.R
+import com.gabbasov.meterscan.common.R
 
 @Composable
 fun ReadingInputDialog(

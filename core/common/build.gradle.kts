@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.gabbasov.meterscan"
+    namespace = "com.gabbasov.meterscan.common"
     compileSdk = 35
 
     defaultConfig {
