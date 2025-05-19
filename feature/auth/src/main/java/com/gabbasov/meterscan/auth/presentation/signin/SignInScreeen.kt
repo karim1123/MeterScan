@@ -96,7 +96,7 @@ internal fun SignUpScreen(
         PasswordTextField(
             textFieldValue = state.content.password,
             onPasswordChanged = onPasswordChanged,
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Done
         )
         Spacer(modifier = Modifier.height(16.dp))
         ActionButton(
