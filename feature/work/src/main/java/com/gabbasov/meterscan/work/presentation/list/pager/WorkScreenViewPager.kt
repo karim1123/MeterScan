@@ -72,7 +72,8 @@ internal fun WorkScreenViewPager(
 
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            userScrollEnabled = false
         ) { page ->
             when (page) {
                 0 -> {
