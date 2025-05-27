@@ -1,6 +1,5 @@
 package com.gabbasov.meterscan.work.presentation.list
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
@@ -8,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import com.gabbasov.meterscan.NavigationRoute
+import com.gabbasov.meterscan.common.ui.NavigationHolder
 import com.gabbasov.meterscan.model.meter.Meter
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -79,6 +80,11 @@ internal class WorkCoordinator(
 
     fun onBuildRoute(meter: Meter) {
         viewModel.execute(WorkAction.BuildRoute(meter))
+    }
+
+    fun onNavigateToScan(meterId: String) {
+        NavigationHolder.rootNavController?.navigate("${NavigationRoute.METER_SCAN.route}/$meterId?goBack=true")
+        viewModel.execute(WorkAction.NavigationHandled)
     }
 
     fun onTabSelected(index: Int) {

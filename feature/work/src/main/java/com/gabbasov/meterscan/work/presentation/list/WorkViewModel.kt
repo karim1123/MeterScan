@@ -66,15 +66,28 @@ internal class WorkViewModel(
         }
     }
 
+
     private fun showReadingDialog(meterId: String) {
         viewModelScope.launch {
             // Загружаем актуальные данные счетчика перед показом диалога
             val meterResource = metersRepository.getMeterById(meterId).first()
             if (meterResource is Resource.Success) {
-                state = state.copy(
-                    showReadingDialog = true,
-                    selectedMeterId = meterId
-                )
+                // Проверяем настройку режима камеры
+                val useCameraMode = settingsRepository.getCameraMode()
+
+                state = if (useCameraMode) {
+                    // Переходим на экран сканирования
+                    state.copy(
+                        navigateToScan = meterId,
+                        selectedMeterId = meterId
+                    )
+                } else {
+                    // Показываем диалог ручного ввода
+                    state.copy(
+                        showReadingDialog = true,
+                        selectedMeterId = meterId
+                    )
+                }
             } else {
                 state = state.copy(
                     error = Text.RawString("Ошибка загрузки данных счетчика")

@@ -100,7 +100,7 @@ fun MeterReadingBottomSheet(
 
     val sheetState = rememberFlexibleBottomSheetState(
         flexibleSheetSize = FlexibleSheetSize(
-            intermediatelyExpanded = 0.5f,
+            intermediatelyExpanded = 0.45f,
             fullyExpanded = 0.88f,
         ),
         skipSlightlyExpanded = true,

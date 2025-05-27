@@ -42,7 +42,7 @@ internal fun WorkScreenRoute(
 
     LaunchedEffect(state.navigateToScan) {
         state.navigateToScan?.let { meterId ->
-            coordinator.onNavigationHandled()
+            coordinator.onNavigateToScan(meterId)
         }
     }
 
@@ -83,11 +83,6 @@ internal fun WorkScreenRoute(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // пока не нужно
-            /*SearchTextField(
-                value = state.searchQuery,
-                onValueChange = coordinator::onSearchQueryChanged
-            )*/
 
             WorkScreenViewPager(
                 metersState = state,
